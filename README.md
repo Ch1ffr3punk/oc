@@ -125,7 +125,8 @@ HiddenServicePort 8084 127.0.0.1:8084
 
 ## oc_node_server.go
 
-oc_node_server.go uses [minicrypt](https://github.com/706f6c6c7578/minicrypt) to decrypt incoming data, prior it sends it to the next hop. The accepted message size for a node is limited to 4096 KB.  
+oc_node_server.go uses [minicrypt](https://github.com/706f6c6c7578/minicrypt) to decrypt incoming data, prior it sends it to the next hop. The accepted message size for a node is limited to 4096 KB.
+You can use the program, included in the genkeys folder, to generate a key pair.  
 
 A node needs a special file format, containing an X-OC-To: header. Multiple hops are supported by chaining messages, like Cypherpunk Remailers (TypeI) do.
   
