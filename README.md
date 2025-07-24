@@ -147,7 +147,7 @@ oc_mail2node.go is a Gateway for sending webmail messages to Onion Courier nodes
 
 ## oc_m2n.go
 
-An Onion Courier mail2news Gateway
+An Onion Courier mail2news Gateway for dizum.com.
 
 ## Closing words
 
