@@ -15,10 +15,11 @@ ocs.bat:
 @echo off
 start /b "" "C:\Users\yourname\path\to\tor.exe" -f C:\Users\yourname\path\to\tor\torrc
 timeout /t 10 
-start /b "" "C:\Users\yourname\path\to\ochome-server.exe" -t -p C:\Users\yourname\path\to\inbox\
+start /b "" "C:\Users\yourname\path\to\ochome-server.exe" -p C:\Users\yourname\path\to\inbox\ -t
 Exit
 
 This will automatically start tor.exe and ochome-server.exe without any cmd.exe windows open.
+
 
 
 
