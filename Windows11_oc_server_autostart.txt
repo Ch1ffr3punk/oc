@@ -15,8 +15,9 @@ ocs.bat:
 @echo off
 start /b "" "C:\Users\yourname\path\to\tor.exe" -f C:\Users\yourname\path\to\tor\torrc
 timeout /t 10 
-start /b "" "C:\Users\yourname\path\to\oc_server.exe" -p C:\Users\yourname\path\to\inbox\ -o yourpassword > "C:\Users\yourname\path\to\inbox\logfile.txt" 2>&1
+start /b "" "C:\Users\yourname\path\to\ochome-server.exe" -t -p C:\Users\yourname\path\to\inbox\
 Exit
 
 This will automatically start tor.exe and oc_server.exe without any cmd.exe windows open and log to logfile.txt.
+
 
