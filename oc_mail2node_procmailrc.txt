@@ -1,2 +1,0 @@
-:0
-| formail -I "" | /home/mail2node/mail2node -s /home/mail2node/private.pem
