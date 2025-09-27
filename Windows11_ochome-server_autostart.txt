@@ -18,6 +18,7 @@ timeout /t 10
 start /b "" "C:\Users\yourname\path\to\ochome-server.exe" -t -p C:\Users\yourname\path\to\inbox\
 Exit
 
-This will automatically start tor.exe and oc_server.exe without any cmd.exe windows open and log to logfile.txt.
+This will automatically start tor.exe and ochome-server.exe without any cmd.exe windows open.
+
 
 
