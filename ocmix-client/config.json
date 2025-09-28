@@ -1,7 +1,0 @@
-{
-  "pubkeys_url": "https://your-server.com/pubring.txt",
-  "mixnodes_url": "https://your-server.com/mixnodes.txt",
-  "config_file": "oc/config.json",
-  "pubkeys_file": "oc/pubring.txt",
-  "mixnodes_file": "oc/mixnodes.txt"
-}
