@@ -30,8 +30,8 @@ func main() {
 
 	os.MkdirAll(inboxPath, 0755)
 	http.HandleFunc("/upload", handleUpload)
-	fmt.Printf("Server running on http://localhost:8080, inbox: %s\n", inboxPath)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Printf("Server running on http://localhost:8081, inbox: %s\n", inboxPath)
+	log.Fatal(http.ListenAndServe(":8081", nil))
 }
 
 func generateRandomFilename(length int) (string, error) {
