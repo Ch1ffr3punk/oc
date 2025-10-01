@@ -133,11 +133,6 @@ SOCKS5 Proxy Configuration: localhost:9050 standard Tor proxy
 Hidden Service Operation: .onion address deployment only  
 Network Timeouts: 120-second connection and transmission timeouts   
 
-Transmission Rate: 1–10 messages per hour (user configurable)  
-Message Size Range: 512–4,096 bytes (user configurable)  
-Special Addressing: .dummy domain recipients for identification  
-Routing Diversity: Random or fixed node sequence selection (1–5 nodes)  
-
 ## Dependencies  
 memguard : Secure memory handling for cryptographic key protection  
 golang.org/x/crypto/nacl/box : Standardized NaCl Box implementation  
