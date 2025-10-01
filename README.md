@@ -128,7 +128,7 @@ Size Correlation Protection: Selective padding prevents message size tracking
 ## Network Protocol - HTTP API Endpoints  
 Primary Upload Endpoint: POST /upload with multipart/form-data encoding  
 File Field Specification: file field containing complete encrypted message binary  
-Response Standardization: Anonymous "OK" responses with timing normalization
+Response Standardization: Anonymous "OK" responses with timing normalization  
 Mixnodes: Port 8080 Endpoints: Port 8088
 
 ## Tor Integration  
