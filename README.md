@@ -81,7 +81,7 @@ The outermost layer transmitted to the first mixnode follows this exact binary s
 | Pool Message Storage Limit| 32,768 bytes (32 KB)         |
 | HTTP Upload Limit         | 28,672 bytes (28 KB)         |
 | Encryption Overhead       | 56 bytes per layer           |
-| Number Of Hops per Chain  | 1-5                          |
+| Number Of Hops Per Chain  | 1-5                          |
 
 ### Mixnode Operational Parameters
 
