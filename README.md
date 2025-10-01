@@ -110,34 +110,36 @@ Configuration
 Ensure Tor is running with SOCKS5 proxy on localhost:9050
 Configure mixnode keys in private.pem and pubring.txt
 Set up hidden service endpoints for mixnodes
-Security Features
-Anonymity Guarantees
-Sender Anonymity: Hidden among multiple legitimate users and cover traffic sources
-Receiver Anonymity: Final destination concealed through multiple routing hops
-Relationship Anonymity: Computational difficulty correlating message senders and receivers
-Temporal Anonymity: Randomized delays prevent timing-based correlation attacks
-Attack Resistance
-Traffic Analysis Resistance: Outer-layer padding and cover traffic
-Timing Attack Mitigation: Randomized delays and constant-time operations
-Partial Node Compromise: Single node compromise doesn't reveal complete message paths
-Size Correlation Protection: Selective padding prevents message size tracking
-Network Protocol
-HTTP API Endpoints
-Primary Upload Endpoint: POST /upload with multipart/form-data encoding
-File Field Specification: file field containing complete encrypted message binary
-Response Standardization: Anonymous "OK" responses with timing normalization
-Tor Integration
-SOCKS5 Proxy Configuration: localhost:9050 standard Tor proxy
-Hidden Service Operation: .onion address deployment only
-Network Timeouts: 120-second connection and transmission timeouts
-Cover Traffic System
-The integrated cover traffic generator creates cryptographically indistinguishable dummy messages:
 
-Transmission Rate: 1–10 messages per hour (user configurable)
-Message Size Range: 512–4,096 bytes (user configurable)
-Special Addressing: .dummy domain recipients for identification
-Routing Diversity: Random or fixed node sequence selection (1–5 nodes)
-Dependencies
-memguard : Secure memory handling for cryptographic key protection
-golang.org/x/crypto/nacl/box : Standardized NaCl Box implementation
-golang.org/x/net/proxy : SOCKS5 proxy support for Tor integration
+##Security Features
+
+### Anonymity Guarantees
+Sender Anonymity: Hidden among multiple legitimate users and cover traffic sources  
+Receiver Anonymity: Final destination concealed through multiple routing hops  
+Relationship Anonymity: Computational difficulty correlating message senders and receivers  
+Temporal Anonymity: Randomized delays prevent timing-based correlation attacks  
+Attack Resistance  
+Traffic Analysis Resistance: Outer-layer padding and cover traffic  
+Timing Attack Mitigation: Randomized delays and constant-time operations  
+Partial Node Compromise: Single node compromise doesn't reveal complete message paths  
+Size Correlation Protection: Selective padding prevents message size tracking  
+Network Protocol  
+HTTP API Endpoints  
+Primary Upload Endpoint: POST /upload with multipart/form-data encoding  
+File Field Specification: file field containing complete encrypted message binary  
+Response Standardization: Anonymous "OK" responses with timing normalization  
+Tor Integration  
+SOCKS5 Proxy Configuration: localhost:9050 standard Tor proxy  
+Hidden Service Operation: .onion address deployment only  
+Network Timeouts: 120-second connection and transmission timeouts  
+Cover Traffic System  
+The integrated cover traffic generator creates cryptographically indistinguishable dummy messages:  
+
+Transmission Rate: 1–10 messages per hour (user configurable)  
+Message Size Range: 512–4,096 bytes (user configurable)  
+Special Addressing: .dummy domain recipients for identification  
+Routing Diversity: Random or fixed node sequence selection (1–5 nodes)  
+Dependencies  
+memguard : Secure memory handling for cryptographic key protection  
+golang.org/x/crypto/nacl/box : Standardized NaCl Box implementation  
+golang.org/x/net/proxy : SOCKS5 proxy support for Tor integration  
