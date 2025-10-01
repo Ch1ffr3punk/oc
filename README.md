@@ -124,8 +124,7 @@ Timing Attack Mitigation: Randomized delays and constant-time operations
 Partial Node Compromise: Single node compromise doesn't reveal complete message paths  
 Size Correlation Protection: Selective padding prevents message size tracking  
 
-## Network Protocol  
-## HTTP API Endpoints  
+## Network Protocol - HTTP API Endpoints  
 Primary Upload Endpoint: POST /upload with multipart/form-data encoding  
 File Field Specification: file field containing complete encrypted message binary  
 Response Standardization: Anonymous "OK" responses with timing normalization  
@@ -138,7 +137,8 @@ Transmission Rate: 1–10 messages per hour (user configurable)
 Message Size Range: 512–4,096 bytes (user configurable)  
 Special Addressing: .dummy domain recipients for identification  
 Routing Diversity: Random or fixed node sequence selection (1–5 nodes)  
-Dependencies  
+
+## Dependencies  
 memguard : Secure memory handling for cryptographic key protection  
 golang.org/x/crypto/nacl/box : Standardized NaCl Box implementation  
 golang.org/x/net/proxy : SOCKS5 proxy support for Tor integration  
