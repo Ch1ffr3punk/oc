@@ -1,4 +1,4 @@
-# Onion Courier
+# Onion Courier Tor Hidden Service Mixnet
 
 Onion Courier is an open-source anonymous communication system that implements a **mixnet architecture over Tor hidden services**. Developed as a research implementation, it provides strong anonymity guarantees through **cryptographic layered encryption**, **traffic analysis protection**, and **systematic cover traffic integration**.
 
