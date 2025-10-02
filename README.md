@@ -138,6 +138,6 @@ Network Timeouts: 120-second connection and transmission timeouts
 
 ## Dependencies  
 memguard : Secure memory handling for cryptographic key protection  
-golang.org/x/crypto/nacl/box : Standardized NaCl Box implementation
+golang.org/x/crypto/nacl/box : Standardized NaCl Box implementation  
 golang.org/x/crypto/chacha20poly1305 : Standardized ChaCha20+Poly1305  
 golang.org/x/net/proxy : SOCKS5 proxy support for Tor integration  
