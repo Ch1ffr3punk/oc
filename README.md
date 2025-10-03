@@ -13,8 +13,6 @@ Onion Courier is a production-ready anonymous communication system that implemen
 - **Timing Attack Protection**: Randomized delays and constant-time cryptographic operations  
 - **Replay Protection**: Cache-based message ID tracking with automatic expiration
 - **Tor Integration**: Operates exclusively over Tor hidden services for enhanced privacy  
-- **Production Ready**: Code quality and security practices suitable for production use
-- **Audit Friendly**: Clean, documented codebase designed for security reviews
 
 ---
 
@@ -238,5 +236,6 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305  
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
+
 
 
