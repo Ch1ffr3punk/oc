@@ -1,16 +1,20 @@
 # Onion Courier Tor Hidden Service Mixnet
 
-Onion Courier is an open-source anonymous communication system that implements a **mixnet architecture over Tor hidden services**. Developed as a research implementation, it provides strong anonymity guarantees through **cryptographic layered encryption**, **traffic analysis protection**, and **systematic cover traffic integration**.
+Onion Courier is a production-ready anonymous communication system that implements a **mixnet architecture over Tor hidden services**. It provides strong anonymity guarantees against both local and global adversaries through **cryptographic layered encryption**, **traffic analysis protection**, and **systematic cover traffic integration**.
 
 ---
 
 ## Features
 
-- **Strong Anonymity Guarantees**: Cryptographic layered encryption and traffic analysis protection  
+- **Strong Anonymity Guarantees**: Protection against both local and global adversaries
 - **Mixnet Architecture**: Decentralized network routing through multiple intermediary nodes  
+- **Forward Secrecy**: Automatic key rotation every 24 hours for pool encryption
 - **Cover Traffic Integration**: Systematic dummy message generation to obscure communication patterns  
 - **Timing Attack Protection**: Randomized delays and constant-time cryptographic operations  
+- **Replay Protection**: Cache-based message ID tracking with automatic expiration
 - **Tor Integration**: Operates exclusively over Tor hidden services for enhanced privacy  
+- **Production Ready**: Code quality and security practices suitable for production use
+- **Audit Friendly**: Clean, documented codebase designed for security reviews
 
 ---
 
@@ -22,7 +26,7 @@ Onion Courier operates as a decentralized mix network where messages are routed 
 
 ### Core Components
 
-- **Mixnode Server**: Go-based concurrent server implementation  
+- **Mixnode Server**: Go-based concurrent server implementation with forward secrecy
 - **Command-Line Client**: POSIX-compliant command-line interface  
 - **Cover Traffic Daemon**: Automated dummy message generation system  
 
@@ -37,9 +41,11 @@ Onion Courier operates as a decentralized mix network where messages are routed 
 - **Private Key Storage**: 32-byte keys stored in PEM format at `private.pem` with filesystem hardening  
 - **Public Key Distribution**: 32-byte public keys distributed through `pubring.txt` public key registry  
 
-### Symmetric Encryption
+### Symmetric Encryption & Forward Secrecy
 
-- **ChaCha20-Poly1305**: For internal message storage within mixnode pools  
+- **ChaCha20-Poly1305**: For internal message storage within mixnode pools with forward secrecy
+- **Automatic Key Rotation**: Pool encryption keys rotated every 24 hours
+- **Dual-Key Support**: Support for both current and next keys during transition periods
 - **Nonce Generation**: 12-byte cryptographically random nonces for each encryption  
 - **Authentication**: 16-byte Poly1305 authentication tags ensuring message integrity  
 
@@ -49,14 +55,16 @@ Onion Courier operates as a decentralized mix network where messages are routed 
 
 ### Layered Encryption Structure
 
-Client → [Encryption Layer N] → Mixnode 1 → [Encryption Layer N-1] → ... → Final Destination
+Client → [Encryption Layer N] → Mixnode 1 (Pool + Delay) → [Encryption Layer N-1] → ... → Final Recipient
 
+
+**Important**: All messages (including final recipients) go through the mixnet pool with randomized delays.
 
 Each encryption layer contains:
 
 - **Routing Header**: `To: <next_hop_address>` specification (except outermost layer)  
 - **Encrypted Payload**: Next layer's complete encrypted message  
-- **Structural Padding**: Applied only to outermost layer for traffic analysis protection  
+- **Structural Padding**: Applied only to plaintext layer for traffic analysis protection  
 
 ### Binary Message Format
 
@@ -64,7 +72,8 @@ The outermost layer transmitted to the first mixnode follows this exact binary s
 
 [32 bytes - Client ephemeral public key]
 [24 bytes - Encryption nonce]
-[N bytes - NaCl Box ciphertext with padding]
+[N bytes - NaCl Box ciphertext with routing header and encrypted payload]
+
 
 
 ---
@@ -89,55 +98,146 @@ The outermost layer transmitted to the first mixnode follows this exact binary s
 - **Minimum Delivery Delay**: 5 minutes (300 seconds)  
 - **Maximum Delivery Delay**: 20 minutes (1,200 seconds)  
 - **Pool Maintenance Interval**: 60-second cleanup cycles  
-- **Maximum Message Age**: 20 minutes before forced delivery  
+- **Key Rotation Interval**: 24 hours for forward secrecy
+- **Replay Cache Expiration**: 30 minutes with 5-minute cleanup
 
 ---
 
-## Installation & Usage
+## Quick Start
 
 ### Prerequisites
 
-- Go programming language  
+- Go programming language (1.16+)  
 - Tor service running on `localhost:9050`  
 
 ### Building from Source
 
 git clone https://github.com/Ch1ffr3punk/oc
 cd oc
-go build
+go build -o ocmix
 
-Configuration
-Ensure Tor is running with SOCKS5 proxy on localhost:9050
-Configure mixnode keys in private.pem and pubring.txt
-Set up hidden service endpoints for mixnodes
+##Generate key pair
+./ocmix -g
 
-## Security Features
+## Start mixnode server
+./ocmix -s private.pem
 
-### Anonymity Guarantees
-Sender Anonymity: Hidden among multiple legitimate users and cover traffic sources  
-Receiver Anonymity: Final destination concealed through multiple routing hops  
-Relationship Anonymity: Computational difficulty correlating message senders and receivers  
-Temporal Anonymity: Randomized delays prevent timing-based correlation attacks  
+## Download configuration (keys and mixnodes)
+./ocmix -i
 
-### Attack Resistance  
-Traffic Analysis Resistance: Outer-layer padding and cover traffic  
-Timing Attack Mitigation: Randomized delays and constant-time operations  
-Partial Node Compromise: Single node compromise doesn't reveal complete message paths  
-Size Correlation Protection: Selective padding prevents message size tracking  
+## Send through 2-5 random nodes
+./ocmix -r < msg.txt
 
-## Network Protocol - HTTP API Endpoints  
-Primary Upload Endpoint: POST /upload with multipart/form-data encoding  
-File Field Specification: file field containing complete encrypted message binary  
-Response Standardization: Anonymous "OK" responses with timing normalization  
-Mixnodes: Port 8080 Endpoints: Port 8088
+## Send through specific nodes  
+./ocmix node1,node2,node3 < msg.txt
 
-## Tor Integration  
-SOCKS5 Proxy Configuration: localhost:9050 standard Tor proxy  
-Hidden Service Operation: .onion address deployment only  
-Network Timeouts: 120-second connection and transmission timeouts   
+## Send cover traffic
+./ocmix -c
 
-## Dependencies  
-memguard : Secure memory handling for cryptographic key protection  
-golang.org/x/crypto/nacl/box : Standardized NaCl Box implementation  
-golang.org/x/crypto/chacha20poly1305 : Standardized ChaCha20+Poly1305  
-golang.org/x/net/proxy : SOCKS5 proxy support for Tor integration  
+##Configuration Files For Client
+Key Distribution (pubring.txt)
+Mixnode Registry (mixnodes.txt)
+both are stored in folder 'oc'
+
+# Start final recipient server (handles both multipart and raw POST)
+./ochome-server -p inbox
+
+##Security Features
+**Forward Secrecy**
+**Automatic Key Rotation:** Pool encryption keys rotated every 24 hours
+
+**Dual-Key Support:** Support for current + next key during transition periods
+
+**ChaCha20-Poly1305:** For pool message encryption with forward secrecy
+
+**Replay Protection**
+Cache-based: Uses in-memory cache with automatic cleanup
+
+**30-minute Expiration:** Message IDs automatically deleted after 30 minutes
+
+**Automatic Cleanup:** Removes expired entries every 5 minutes
+
+**Timing Attack Protection**
+Randomized Delays: 5-20 minute random delays per hop using cryptographic RNG
+
+**Constant-Time Processing:** All cryptographic operations in constant time
+
+**Timing Obfuscation:** Cryptographically secure random delays for responses
+
+##Anonymity Guarantees
+**Sender Anonymity:** Hidden among multiple legitimate users and cover traffic sources
+
+**Receiver Anonymity:** Final destination concealed through multiple routing hops
+
+**Relationship Anonymity:** Computational difficulty correlating message senders and receivers
+
+**Temporal Anonymity:** Randomized delays prevent timing-based correlation attacks
+
+**Global Adversary Protection:** Mixnet architecture protects against network-wide surveillance
+
+##Attack Resistance
+**Traffic Analysis Resistance:** Outer-layer padding and cover traffic
+
+**Timing Attack Mitigation:** Randomized delays and constant-time operations
+
+**Partial Node Compromise:** Forward secrecy protects older messages
+
+**Size Correlation Protection:** Adaptive padding prevents message size tracking
+
+**Replay Attack Prevention:** Cache-based message ID tracking
+
+**Network Analysis:** Tor hidden services + mixnet provide layered protection
+
+##Network Protocol - HTTP API Endpoints
+Mixnodes
+Port: 8080
+
+Endpoint: POST /upload
+
+Format: multipart/form-data with field file
+
+Response: Always "OK" with random timing
+
+Final Recipients
+Port: 8088 (or other service port)
+
+Format: Accepts both multipart/form-data and raw POST data
+
+Response: Always "OK" for consistent responses
+
+Message Flow
+All messages (including final recipients) go through the mixnet pool with randomized delays:
+
+Client → Mixnode 1 (Pool + 5-20min Delay) → Mixnode 2 (Pool + 5-20min Delay) → Final Recipient
+
+Pool Management
+Individual Scheduling: Each message has individual random delay
+
+Emergency Batch: On pool overflow, 33% of messages sent immediately with secure randomization
+
+Secure Randomization: Cryptographically secure random selection for batches
+
+##Threat Model
+###Protected Against
+**Traffic Analysis:** Through padding and cover traffic
+**Timing Attacks:** Through randomized delays and constant-time operations
+**Replay Attacks:** Through message-ID cache with expiration
+**Node Compromise:** Forward secrecy protects older messages
+**Size Correlation:** Adaptive padding prevents size analysis
+**Partial Network Observation:** Mixnet architecture provides unlinkability
+**Global Adversary:** Multi-hop routing breaks end-to-end correlation
+**Metadata Analysis:** No persistent metadata retention
+
+###Security Assumptions
+Tor Hidden Services provide sufficient network-level anonymity
+At least one mixnode in the path is trustworthy
+Cryptographic primitives (Curve25519, ChaCha20, Poly1305) are secure
+Operating system provides secure random number generation
+
+##Dependencies
+memguard: Secure memory handling for cryptographic key protection
+golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
+golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305
+golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration
+patrickmn/go-cache: In-memory cache for replay protection
+
