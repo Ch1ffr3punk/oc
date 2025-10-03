@@ -137,10 +137,10 @@ Mixnode Registry (mixnodes.txt) both are stored in folder 'oc'
 ## Send cover traffic
 ./ocmix -c
 
-# Start final recipient server (handles both multipart and raw POST)
+## Start final recipient server (handles both multipart and raw POST)
 ./ochome-server -p inbox
 
-##Security Features
+## Security Features
 **Forward Secrecy**
 **Automatic Key Rotation:** Pool encryption keys rotated every 24 hours
 
@@ -238,6 +238,7 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration
 patrickmn/go-cache: In-memory cache for replay protection
+
 
 
 
