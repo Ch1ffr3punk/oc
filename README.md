@@ -124,6 +124,8 @@ go build -o ocmix
 
 ## Download configuration (keys and mixnodes)
 ./ocmix -i
+Configuration Files For Client Key Distribution (pubring.txt)  
+Mixnode Registry (mixnodes.txt) both are stored in folder 'oc'  
 
 ## Send through 2-5 random nodes
 ./ocmix -r < msg.txt
@@ -240,4 +242,5 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration
 patrickmn/go-cache: In-memory cache for replay protection
+
 
