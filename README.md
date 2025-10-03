@@ -28,7 +28,8 @@ Onion Courier operates as a decentralized mix network where messages are routed 
 
 - **Mixnode Server**: Go-based concurrent server implementation with forward secrecy
 - **Command-Line Client**: POSIX-compliant command-line interface  
-- **Cover Traffic Daemon**: Automated dummy message generation system  
+- **Cover Traffic Daemon**: Automated dummy message generation system (available upon request)  
+- **Endpoint Server**: Receiving site for messages from the Mixnet 
 
 ---
 
@@ -237,6 +238,7 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration
 patrickmn/go-cache: In-memory cache for replay protection
+
 
 
 
