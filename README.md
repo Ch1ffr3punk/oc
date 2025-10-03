@@ -216,25 +216,26 @@ Emergency Batch: On pool overflow, 33% of messages sent immediately with secure 
 Secure Randomization: Cryptographically secure random selection for batches
 
 ## Threat Model
-### Protected Against
-**Traffic Analysis:** Through padding and cover traffic
-**Timing Attacks:** Through randomized delays and constant-time operations
-**Replay Attacks:** Through message-ID cache with expiration
-**Node Compromise:** Forward secrecy protects older messages
-**Size Correlation:** Adaptive padding prevents size analysis
-**Partial Network Observation:** Mixnet architecture provides unlinkability
-**Global Adversary:** Multi-hop routing breaks end-to-end correlation
-**Metadata Analysis:** No persistent metadata retention
+### Protected Against  
+**Traffic Analysis:** Through padding and cover traffic  
+**Timing Attacks:** Through randomized delays and constant-time operations  
+**Replay Attacks:** Through message-ID cache with expiration  
+**Node Compromise:** Forward secrecy protects older messages  
+**Size Correlation:** Adaptive padding prevents size analysis  
+**Partial Network Observation:** Mixnet architecture provides unlinkability  
+**Global Adversary:** Multi-hop routing breaks end-to-end correlation  
+**Metadata Analysis:** No persistent metadata retention  
 
-### Security Assumptions
-Tor Hidden Services provide sufficient network-level anonymity
-At least one mixnode in the path is trustworthy
-Cryptographic primitives (Curve25519, ChaCha20, Poly1305) are secure
-Operating system provides secure random number generation
+### Security Assumptions  
+Tor Hidden Services provide sufficient network-level anonymity  
+At least one mixnode in the path is trustworthy  
+Cryptographic primitives (Curve25519, ChaCha20, Poly1305) are secure  
+Operating system provides secure random number generation  
 
-## Dependencies
-memguard: Secure memory handling for cryptographic key protection
-golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
-golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305
-golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration
-patrickmn/go-cache: In-memory cache for replay protection
+## Dependencies  
+memguard: Secure memory handling for cryptographic key protection  
+golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation  
+golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305  
+golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
+patrickmn/go-cache: In-memory cache for replay protection  
+
