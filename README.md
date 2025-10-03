@@ -118,24 +118,24 @@ cd oc
 go build -o ocmix
 
 ##Generate key pair
-./ocmix -g
+./ocmix-server -g
 
 ## Start mixnode server
-./ocmix -s private.pem
+./ocmix-server -s private.pem
 
 ## Download configuration (keys and mixnodes)
-./ocmix -i  
+./ocmix-client -i  
 Configuration Files For Client Key Distribution (pubring.txt)  
 Mixnode Registry (mixnodes.txt) both are stored in folder 'oc'  
 
 ## Send through 2-5 random nodes
-./ocmix -r < msg.txt
+./ocmix-client -r < msg.txt
 
 ## Send through specific nodes  
-./ocmix node1,node2,node3 < msg.txt
+./ocmix-client node1,node2,node3 < msg.txt
 
 ## Send cover traffic
-./ocmix -c
+./ocmix-client -c
 
 ## Start final recipient server (handles both multipart and raw POST)
 ./ochome-server -p inbox
@@ -238,4 +238,5 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305  
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
+
 
