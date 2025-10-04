@@ -173,8 +173,8 @@ ulf                     OK
 wau                     OK
 ```
 If you are a respected member of a privacy community and would  
-like your public mixnode been listed, just mail me the public  
-key and mixnode address to sacenaterATgmailDOTcom    
+like your public mixnode been listed, just mail me the public key  
+and mixnode address to sacenaterATgmailDOTcom    
 
 ## Start endpoint server (handles both multipart and raw POST)
 $ ./ochome-server -p inbox
@@ -277,6 +277,7 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305  
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
+
 
 
 
