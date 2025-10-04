@@ -791,7 +791,7 @@ func encryptAndUpload(names []string, plaintext []byte, config *Config) {
     
     for _, name := range names {
         if _, found := findMixnode(mixnodes, name); !found {
-            fmt.Printf("ERROR: Mix node '%s' not found\n", name)
+            fmt.Printf("ERROR: mix node '%s' not found\n", name)
             os.Exit(1)
         }
         if _, found := findPublicKey(pubKeys, name); !found {
@@ -938,3 +938,4 @@ func main() {
 		encryptAndUploadManual(namesArg, plaintext)
 	}
 }
+
