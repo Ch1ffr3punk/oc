@@ -157,8 +157,6 @@ func pingMixnodes() {
 	}
 
 	fmt.Println("Checking mixnode status via Tor...\n")
-	// fmt.Println("Name\t\t\tStatus")
-	// fmt.Println("----\t\t\t------")
 
 	for i := range mixnodes {
 		status := checkNodeStatus(mixnodes[i].Address)
@@ -286,7 +284,7 @@ func ensureConfig() (*Config, error) {
 	}
 	
 	if _, err := os.Stat(config.MixnodesFile); os.IsNotExist(err) {
-		return nil, fmt.Errorf("mixnodes file not found: %s\nRun 'ocmix -i' first to download configuration", config.MixnodesFile)
+		return nil, fmt.Errorf("mix nodes file not found: %s\nRun 'ocmix -i' first to download configuration", config.MixnodesFile)
 	}
 	
 	return config, nil
@@ -303,7 +301,7 @@ func downloadConfigurations() {
 	if strings.Contains(config.PubKeysURL, "example.com") || strings.Contains(config.MixnodesURL, "example.com") {
 		fmt.Println("WARNING: Configuration uses example URLs. Please edit the config file first:")
 		fmt.Printf("  %s\n", config.ConfigFile)
-		fmt.Println("\nUpdate the PubKeysURL and MixnodesURL with actual URLs.")
+		fmt.Println("\nUpdate the pub keys URL and mix nodes URL with actual URLs.")
 		os.Exit(1)
 	}
 
@@ -371,14 +369,14 @@ func encryptAndUploadRandom(plaintext []byte) {
 
 	mixnodes, err := loadMixnodeAddresses(config.MixnodesFile)
 	if err != nil {
-		fmt.Printf("Error loading Mixnode addresses: %v\n", err)
+		fmt.Printf("Error loading mix node addresses: %v\n", err)
 		os.Exit(1)
 	}
 
 	numHops := 2 + randInt(4) // 2 to 5 hops
 
 	if len(mixnodes) < numHops {
-		fmt.Printf("Not enough mixnodes available. Need %d, have %d\n", numHops, len(mixnodes))
+		fmt.Printf("Not enough mix nodes available. Need %d, have %d\n", numHops, len(mixnodes))
 		os.Exit(1)
 	}
 
@@ -401,12 +399,12 @@ func sendDummyTraffic() {
 
 	mixnodes, err := loadMixnodeAddresses(config.MixnodesFile)
 	if err != nil {
-		fmt.Printf("Error loading Mixnode addresses: %v\n", err)
+		fmt.Printf("Error loading mix node addresses: %v\n", err)
 		os.Exit(1)
 	}
 
 	if len(mixnodes) < 1 {
-		fmt.Printf("No mixnodes available for cover traffic\n")
+		fmt.Printf("No mix nodes available for cover traffic\n")
 		os.Exit(1)
 	}
 
@@ -422,7 +420,7 @@ func sendDummyTraffic() {
 func sendSingleDummyMessage(config *Config, mixnodes []MixnodeEntry, messageCount int) error {
 	chainLength := 1 + randInt(5)
 	if len(mixnodes) < chainLength {
-		return fmt.Errorf("not enough mixnodes. Need %d, have %d", chainLength, len(mixnodes))
+		return fmt.Errorf("not enough mix nodes. Need %d, have %d", chainLength, len(mixnodes))
 	}
 
 	selectedNodes := selectRandomNodes(mixnodes, chainLength)
@@ -687,8 +685,6 @@ func loadMixnodeAddresses(filename string) ([]MixnodeEntry, error) {
 		name := strings.TrimSpace(lines[0])
 		address := strings.TrimSpace(lines[1])
 		
-		// STELLE SICHER, DASS ALLE MIXNODES PORT 8080 VERWENDEN
-		// Wenn keine Port angegeben ist, füge :8080 hinzu
 		if !strings.Contains(address, ":") {
 			address = address + ":8080"
 		}
@@ -789,13 +785,13 @@ func encryptAndUpload(names []string, plaintext []byte, config *Config) {
 
     mixnodes, err := loadMixnodeAddresses(config.MixnodesFile)
     if err != nil {
-        fmt.Printf("Error loading mixnodes: %v\n", err)
+        fmt.Printf("Error loading mix nodes: %v\n", err)
         os.Exit(1)
     }
     
     for _, name := range names {
         if _, found := findMixnode(mixnodes, name); !found {
-            fmt.Printf("ERROR: Mixnode '%s' not found\n", name)
+            fmt.Printf("ERROR: Mix node '%s' not found\n", name)
             os.Exit(1)
         }
         if _, found := findPublicKey(pubKeys, name); !found {
@@ -831,7 +827,7 @@ func encryptAndUpload(names []string, plaintext []byte, config *Config) {
             nextNode := strings.TrimSpace(names[i+1])
             nextMixnode, found := findMixnode(mixnodes, nextNode)
             if !found {
-                fmt.Printf("FATAL: Next mixnode not found.")
+                fmt.Printf("FATAL: Next mix node not found.")
                 os.Exit(1)
             }
             nextHop = nextMixnode.Address
@@ -890,10 +886,10 @@ func encryptAndUpload(names []string, plaintext []byte, config *Config) {
 func main() {
 	startTime = time.Now()
 	
-	randomFlag := flag.Bool("r", false, "Send through 2-5 random mixnodes")
+	randomFlag := flag.Bool("r", false, "Send through 2-5 random mix nodes")
 	infoFlag := flag.Bool("i", false, "Download and update configuration files")
 	dummyFlag := flag.Bool("c", false, "Enable cover traffic mode")
-	pingFlag := flag.Bool("p", false, "Check status of all mixnodes")
+	pingFlag := flag.Bool("p", false, "Check status of all mix nodes")
 	flag.Parse()
 
 	if *pingFlag {
@@ -914,10 +910,10 @@ func main() {
 	if !*randomFlag && flag.NArg() == 0 {
 		fmt.Printf("Usage:\n")
 		fmt.Printf("  ocmix -i                              Download configuration files\n")
-		fmt.Printf("  ocmix -r < infile                     Send through 2-5 random mixnodes\n")
-		fmt.Printf("  ocmix node1,node2,node3 < infile      Send through specific mixnodes\n")
+		fmt.Printf("  ocmix -r < infile                     Send through 2-5 random mix nodes\n")
+		fmt.Printf("  ocmix node1,node2,node3 < infile      Send through specific mix nodes\n")
 		fmt.Printf("  ocmix -c                              Send cover traffic\n")
-		fmt.Printf("  ocmix -p                              Check status of all mixnodes\n")
+		fmt.Printf("  ocmix -p                              Check status of all mix nodes\n")
 		os.Exit(1)
 	}
 
