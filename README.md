@@ -123,7 +123,6 @@ Type 'logout', press Enter
 
 ## Download configuration (keys and mixnodes)
 $ ./ocmix-client -i  
-$ ocmix -i
 Downloading config files via Tor...  
 Config directory: oc  
 ✓ Mixnodes file created: oc/mixnodes.txt  
@@ -275,6 +274,7 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305  
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
+
 
 
 
