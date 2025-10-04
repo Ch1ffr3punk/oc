@@ -150,16 +150,16 @@ Regards
 Bob
 
 ## Send through 2-5 random nodes
-./ocmix-client -r < msg.txt
+$ ./ocmix-client -r < msg.txt
 
 ## Send through specific nodes  
-./ocmix-client node1,node2,node3 < msg.txt
+$ ./ocmix-client node1,node2,node3 < msg.txt
 
 ## Send cover traffic
-./ocmix-client -c
+$ ./ocmix-client -c
 
-## Start final recipient server (handles both multipart and raw POST)
-./ochome-server -p inbox
+## Start endpoint server (handles both multipart and raw POST)
+$ ./ochome-server -p inbox
 
 ## Security Features
 **Forward Secrecy**
@@ -259,6 +259,7 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305  
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
+
 
 
 
