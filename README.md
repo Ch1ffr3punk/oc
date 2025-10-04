@@ -134,6 +134,22 @@ Hello World!
 Regards  
 Bob
 
+Please note: The endpoint server will remove the first
+To: header and the blank line following. Keep that in
+mind if you create messages for clearnet emails or
+Usenet, so that they look like this:
+
+To: vztrzrdafvnjegctrltkv6azyrjqawqmrwnhe7kvaqnj5vvnwhoiq7id.onion:8088
+
+To: mail2news@dizum.com  
+Subject: Test  
+Newsgroups: alt.test.test  
+
+Hello World!
+
+Regards  
+Bob
+
 ## Send through 2-5 random nodes
 ./ocmix-client -r < msg.txt
 
@@ -244,6 +260,7 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305  
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
+
 
 
 
