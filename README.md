@@ -158,6 +158,16 @@ $ ./ocmix-client node1,node2,node3 < msg.txt
 ## Send cover traffic
 $ ./ocmix-client -c
 
+## Ping mixnodes to see their status  
+$ ./ocmix-client -p  
+Checking mixnode status via Tor...  
+
+bob                     OK  
+hal                     OK  
+len                     OK  
+ulf                     OK  
+wau                     OK  
+
 ## Start endpoint server (handles both multipart and raw POST)
 $ ./ochome-server -p inbox
 
@@ -259,6 +269,7 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305  
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
+
 
 
 
