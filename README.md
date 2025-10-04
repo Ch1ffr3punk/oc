@@ -36,7 +36,7 @@ Onion Courier operates as a decentralized mix network where messages are routed 
 ### Asymmetric Encryption
 
 - **NaCl Box**: Curve25519 for key exchange, XSalsa20 for encryption, and Poly1305 for authentication  
-- **Key Management**: Persistent X25519 key pairs for mixnodes, ephemeral key pairs for clients  
+- **Key Management**: Persistent X25519 key pairs for mixnodes   
 - **Private Key Storage**: 32-byte keys stored in PEM format at `private.pem` with filesystem hardening  
 - **Public Key Distribution**: 32-byte public keys distributed through `pubring.txt` public key registry  
 
@@ -297,6 +297,7 @@ Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
