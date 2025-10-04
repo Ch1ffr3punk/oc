@@ -111,6 +111,12 @@ The outermost layer transmitted to the first mixnode follows this exact binary s
 - Endpoint Server: Tor Hidden Service running on `localhost:8088` 
 - Mix Client: Tor running on `localhost:9050`
 
+## Compiling ocmix-server
+In line 1112 of the source code replace the .onion address with
+your own and remember that the server must use port 8080, in order  
+to function properly with public or anonymous Onion Courier Mixnets.
+$ go build -ldflags "-s -w"
+
 ## Generate key pair
 $ ./ocmix-server -g
 
@@ -287,4 +293,5 @@ Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
