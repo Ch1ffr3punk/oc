@@ -93,7 +93,7 @@ The outermost layer transmitted to the first mixnode follows this exact binary s
 
 ### Mixnode Operational Parameters
 
-- **Maximum Pool Capacity**: 500 messages  
+- **Maximum Pool Capacity**: 1000 messages  
 - **Minimum Delivery Delay**: 5 minutes (300 seconds)  
 - **Maximum Delivery Delay**: 20 minutes (1,200 seconds)  
 - **Pool Maintenance Interval**: 60-second cleanup cycles  
@@ -293,6 +293,7 @@ Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
