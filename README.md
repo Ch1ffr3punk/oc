@@ -116,6 +116,10 @@ The outermost layer transmitted to the first mixnode follows this exact binary s
 
 ## Start mixnode server
 ./ocmix-server -s private.pem
+2025/10/04 11:34:55 🧅 Onion Courier mixnode running 🚀
+Press CTRL-Z
+Enter 'bg'
+Enter 'logout'
 
 ## Download configuration (keys and mixnodes)
 ./ocmix-client -i  
@@ -232,6 +236,7 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305  
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
+
 
 
 
