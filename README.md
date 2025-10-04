@@ -162,12 +162,7 @@ $ ./ocmix-client -c
 $ ./ocmix-client -p  
 Checking mixnode status via Tor...  
 
-bob**Installation:**
-&nbsp;&nbsp;&nbsp;&nbsp;npm install
-&nbsp;&nbsp;&nbsp;&nbsp;npm start
-
-**Verwendung:**
-bob &nbsp;&nbsp;&nbsp;&nbsp;OK  
+bob &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OK  
 hal                     OK  
 len                     OK  
 ulf                     OK  
@@ -274,6 +269,7 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305  
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
+
 
 
 
