@@ -278,6 +278,7 @@ golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
 
+## --
 If you like the idea of an own privately run Onion Courier Mixnet,    
 as much as I do, consider a small donation.    
 ```  
@@ -286,3 +287,4 @@ Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
