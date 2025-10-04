@@ -159,6 +159,9 @@ Hello World!
 Regards  
 Bob
 
+If you plan to run ochome-server on a remote server, I suggest using  
+[oget](https://github.com/Ch1ffr3punk/oget), to download messages.  
+
 ## Send through 2-5 random nodes
 $ ./ocmix-client -r < msg.txt
 
@@ -294,6 +297,7 @@ Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
