@@ -123,8 +123,12 @@ Type 'logout', press Enter
 
 ## Download configuration (keys and mixnodes)
 $ ./ocmix-client -i  
-Configuration Files For Client Key Distribution (pubring.txt)  
-Mixnode Registry (mixnodes.txt) both are stored in folder 'oc'  
+$ ocmix -i
+Downloading config files via Tor...  
+Config directory: oc  
+✓ Mixnodes file created: oc/mixnodes.txt  
+✓ Pubkeys file created: oc/pubring.txt  
+Configuration updated successfully!   
 
 ## Create your message for an endpoint server
 To: vztrzrdafvnjegctrltkv6azyrjqawqmrwnhe7kvaqnj5vvnwhoiq7id.onion:8088
@@ -271,6 +275,7 @@ golang.org/x/crypto/nacl/box: Standardized NaCl Box implementation
 golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305  
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
+
 
 
 
