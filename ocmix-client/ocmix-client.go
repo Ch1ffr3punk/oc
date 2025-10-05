@@ -314,19 +314,19 @@ func downloadConfigurations() {
 	}
 
 	if err := downloadFileViaTor(config.PubKeysURL, config.PubKeysFile); err != nil {
-		fmt.Printf("Error downloading pubkeys: %v\n", err)
+		fmt.Printf("Error downloading pub keys: %v\n", err)
 		os.Exit(1)
 	}
 	if err := downloadFileViaTor(config.MixnodesURL, config.MixnodesFile); err != nil {
-		fmt.Printf("Error downloading mixnodes: %v\n", err)
+		fmt.Printf("Error downloading mix nodes: %v\n", err)
 		os.Exit(1)
 	}
 	
 	if _, err := os.Stat(config.MixnodesFile); err == nil {
-		fmt.Printf("✓ Mixnodes file created: %s\n", config.MixnodesFile)
+		fmt.Printf("✓ mix nodes file created: %s\n", config.MixnodesFile)
 	}
 	if _, err := os.Stat(config.PubKeysFile); err == nil {
-		fmt.Printf("✓ Pubkeys file created: %s\n", config.PubKeysFile)
+		fmt.Printf("✓ pub keys file created: %s\n", config.PubKeysFile)
 	}
 	
 	fmt.Println("Configuration updated successfully!")
@@ -354,7 +354,6 @@ func downloadFileViaTor(url, filename string) error {
 		return err
 	}
 	
-	// Stelle sicher, dass das Verzeichnis existiert
 	os.MkdirAll(filepath.Dir(filename), 0700)
 	return os.WriteFile(filename, data, 0600)
 }
@@ -938,5 +937,6 @@ func main() {
 		encryptAndUploadManual(namesArg, plaintext)
 	}
 }
+
 
 
