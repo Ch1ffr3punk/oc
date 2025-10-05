@@ -198,14 +198,14 @@ If you plan to run ochome-server on a remote server, I suggest using
 
 **ChaCha20-Poly1305:** For pool message encryption with forward secrecy
 
-**Replay Protection**
+**Replay Protection:**
 Cache-based: Uses in-memory cache with automatic cleanup
 
 **30-minute Expiration:** Message IDs automatically deleted after 30 minutes
 
 **Automatic Cleanup:** Removes expired entries every 5 minutes
 
-**Timing Attack Protection**
+**Timing Attack Protection:**
 Randomized Delays: 5-20 minute random delays per hop using cryptographic RNG
 
 **Constant-Time Processing:** All cryptographic operations in constant time
@@ -298,6 +298,7 @@ Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
