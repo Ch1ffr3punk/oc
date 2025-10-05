@@ -151,12 +151,12 @@ func pingMixnodes() {
 
 	mixnodes, err := loadMixnodeAddresses(config.MixnodesFile)
 	if err != nil {
-		fmt.Printf("Error loading Mixnode addresses: %v\n", err)
-		fmt.Printf("Please run 'ocmix -i' first to download the mixnodes list\n")
+		fmt.Printf("Error loading mix node addresses: %v\n", err)
+		fmt.Printf("Please run 'ocmix -i' first to download the mix nodes list\n")
 		os.Exit(1)
 	}
 
-	fmt.Println("Checking mixnode status via Tor...\n")
+	fmt.Println("Checking mix node status via Tor...\n")
 
 	for i := range mixnodes {
 		status := checkNodeStatus(mixnodes[i].Address)
@@ -938,4 +938,5 @@ func main() {
 		encryptAndUploadManual(namesArg, plaintext)
 	}
 }
+
 
