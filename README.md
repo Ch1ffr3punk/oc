@@ -20,7 +20,7 @@ Onion Courier is a production-ready anonymous communication system that implemen
 
 ### System Design
 
-Onion Courier operates as a decentralized mix network where messages are routed through multiple intermediary nodes called **mixnodes** before reaching their final destination. The system follows the classic mixnet paradigm first proposed by [**David Chaum**](https://en.wikipedia.org/wiki/David_Chaum), where each mixnode sequentially peels off one layer of encryption, providing **unlinkability** between incoming and outgoing messages.
+Onion Courier operates as a decentralized mix network where messages are routed through multiple intermediary nodes called **mix nodes** before reaching their final destination. The system follows the classic mixnet paradigm first proposed by [**David Chaum**](https://en.wikipedia.org/wiki/David_Chaum), where each mixnode sequentially peels off one layer of encryption, providing **unlinkability** between incoming and outgoing messages.
 
 ### Core Components
 
@@ -297,6 +297,7 @@ Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
