@@ -148,8 +148,9 @@ Please note: The endpoint server will remove the first  To: header and
 the blank line following. Keep that in mind if you create messages for  
 clearnet emails or Usenet, so that they look like this:    
 
-To: vztrzrdafvnjegctrltkv6azyrjqawqmrwnhe7kvaqnj5vvnwhoiq7id.onion:8088
+To: ugf7olo27n5nq2jr6yoai2j5jo24ogx6yemjaozsgxg3byfpcpwdg7id.onion:8088  
 
+From: Onion Courier <noreply@oc2mx.net>  
 To: mail2news@dizum.com  
 Subject: Test  
 Newsgroups: alt.test.test  
@@ -297,6 +298,7 @@ Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
