@@ -67,7 +67,7 @@ Each encryption layer contains:
 
 ### Binary Message Format
 
-The outermost layer transmitted to the first mixnode follows this exact binary structure:
+The outermost layer transmitted to the first mix node follows this exact binary structure:
 
 [32 bytes - Client ephemeral public key]
 [24 bytes - Encryption nonce]
@@ -297,6 +297,7 @@ Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
