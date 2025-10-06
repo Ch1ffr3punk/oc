@@ -1061,7 +1061,7 @@ func main() {
     initSecurity()
     initKeyManager() // Forwarrd secrecy initialized here
 
-    log.Printf("🧅 Onion Courier mixnode running 🚀")
+    log.Printf("🧅 Onion Courier mix node running 🚀")
 
     go managePool()
 
@@ -1069,3 +1069,4 @@ func main() {
     
     log.Fatal(http.ListenAndServe(":8080", nil))
 }
+
