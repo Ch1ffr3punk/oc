@@ -18,6 +18,11 @@ ulf
 GB/oF8jLlwCLNR+5nf/qJnZgIveMG6fpBdlxnqh2GmI=
 -----END PUBLIC KEY-----
 
+vic
+-----BEGIN PUBLIC KEY-----
+/04BAkADBN/xsfiQk4ZVP38i+2s5f2RxXDOi9pUhpw4=
+-----END PUBLIC KEY-----
+
 wau
 -----BEGIN PUBLIC KEY-----
 2WvHsGEH4xLOAsz68gr0ijiztUEXfJ0W/tIj/JtV+yg=
