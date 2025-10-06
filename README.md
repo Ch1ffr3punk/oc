@@ -128,7 +128,7 @@ Press CTRL-Z, press Enter
 Type 'bg', press Enter   
 Type 'logout', press Enter    
 
-## Download configuration (keys and mixnodes)
+## Download configuration (keys and mix nodes)
 $ ./ocmix-client -i  
 Downloading config files via Tor...  
 Config directory: oc  
@@ -298,6 +298,7 @@ Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
