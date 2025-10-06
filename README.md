@@ -278,7 +278,7 @@ Secure Randomization: Cryptographically secure random selection for batches
 
 ### Security Assumptions  
 Tor Hidden Services provide sufficient network-level anonymity  
-At least one mixnode in the path is trustworthy  
+At least one mix node in the path is trustworthy  
 Cryptographic primitives (Curve25519, ChaCha20, Poly1305) are secure  
 Operating system provides secure random number generation  
 
@@ -298,6 +298,7 @@ Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
