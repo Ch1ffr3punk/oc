@@ -189,7 +189,10 @@ sacenatorATgmailDOTcom.
 $ ./ochome-server -p inbox
 
 If you plan to run ochome-server on a remote server, I suggest using   
-[oget](https://github.com/Ch1ffr3punk/oget), to download messages.  
+[oget](https://github.com/Ch1ffr3punk/oget), to download messages. 
+
+## Send files directly to an endpoint server (base64 encoded)    
+$ ./ocsend-client address:port < file  
 
 ## Security Features
 **Forward Secrecy**
@@ -301,6 +304,7 @@ XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk9
 Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk) 
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
