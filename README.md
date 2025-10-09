@@ -160,6 +160,9 @@ Hello World!
 Regards  
 Bob
 
+When using an email or Usenet gateway and you like to insert UTF-8  
+characters in your From: and Subject: header I recommend using [mbe](https://github.com/Ch1ffr3punk/mbe)  
+
 ## Send through 2-5 random nodes
 $ ./ocmix-client -r < msg.txt
 
@@ -304,6 +307,7 @@ XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk9
 Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk) 
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
