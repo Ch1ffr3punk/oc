@@ -1,7 +1,0 @@
-{
-  "pubkeys_url": "https://raw.githubusercontent.com/Ch1ffr3punk/oc/refs/heads/main/mixnodes/pubring.txt",
-  "mixnodes_url": "https://raw.githubusercontent.com/Ch1ffr3punk/oc/refs/heads/main/mixnodes/mixnodes.txt",
-  "config_file": "oc/config.json",
-  "pubkeys_file": "oc/pubring.txt",
-  "mixnodes_file": "oc/mixnodes.txt"
-}
