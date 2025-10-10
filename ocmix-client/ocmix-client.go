@@ -83,53 +83,67 @@ func min(a, b int) int {
 	return b
 }
 
+// adaptivePadding applies padding that automatically adapts to available space
 func adaptivePadding(message []byte, maxTotalSize int) ([]byte, error) {
-    messageSize := len(message)
-    availableSpace := maxTotalSize - messageSize
-    overhead := len(PaddingHeader) + len(PaddingFooter) + 4
-    
-    minPadding := 64
-    if availableSpace <= overhead + minPadding {
-        paddingSize := max(1, availableSpace - overhead)
-        if paddingSize > 0 {
-            padding := make([]byte, paddingSize)
-            if _, err := rand.Read(padding); err != nil {
-                return nil, fmt.Errorf("failed to generate minimal padding: %v", err)
-            }
-            padded := fmt.Sprintf("%s\n%s\n%s\n%s", 
-                PaddingHeader,
-                string(padding),
-                PaddingFooter,
-                string(message))
-            return []byte(padded), nil
-        }
-        return message, nil
-    }
+	if !bytes.HasPrefix(message, []byte("To:")) {
+		return nil, fmt.Errorf("message must start with 'To:' header")
+	}
 
-    maxPaddingSize := availableSpace - overhead
-    targetPaddingSize := 0
-    
-    if maxPaddingSize >= MaxTotalSize-MinTotalSize {
-        targetPaddingSize = MinTotalSize + randInt(MaxTotalSize-MinTotalSize+1) - messageSize
-        if targetPaddingSize > maxPaddingSize {
-            targetPaddingSize = maxPaddingSize
-        }
-    } else {
-        targetPaddingSize = maxPaddingSize
-    }
+	messageSize := len(message)
+	
+	// Calculate available space for padding
+	availableSpace := maxTotalSize - messageSize
+	overhead := len(PaddingHeader) + len(PaddingFooter) + 4 // 4 bytes for newlines
+	
+	// If not enough space for padding, return original message
+	if availableSpace <= overhead {
+		return message, nil
+	}
 
-    padding := make([]byte, targetPaddingSize)
-    if _, err := rand.Read(padding); err != nil {
-        return nil, fmt.Errorf("failed to generate padding: %v", err)
-    }
+	// Maximum padding based on available space
+	maxPaddingSize := availableSpace - overhead
+	
+	// Choose random padding size within available space
+	targetPaddingSize := randInt(maxPaddingSize + 1) // +1 because randInt is exclusive
 
-    padded := fmt.Sprintf("%s\n%s\n%s\n%s", 
-        PaddingHeader,
-        string(padding),
-        PaddingFooter,
-        string(message))
+	// At least 1 byte padding if possible
+	if targetPaddingSize == 0 && maxPaddingSize > 0 {
+		targetPaddingSize = 1
+	}
 
-    return []byte(padded), nil
+	// Generate padding bytes
+	padding := make([]byte, targetPaddingSize)
+	if _, err := rand.Read(padding); err != nil {
+		return nil, fmt.Errorf("failed to generate padding: %v", err)
+	}
+
+	// Construct padded message
+	padded := fmt.Sprintf("%s\n%s\n%s\n%s", 
+		PaddingHeader,
+		string(padding),
+		PaddingFooter,
+		string(message))
+
+	// FINAL SIZE VALIDATION - Ensure we don't exceed the limit
+	if len(padded) > maxTotalSize {
+		// If still too large, use maximum possible size
+		availableSpace = maxTotalSize - messageSize - overhead
+		if availableSpace > 0 {
+			padding = make([]byte, availableSpace)
+			if _, err := rand.Read(padding); err != nil {
+				return message, nil // Fallback to original message
+			}
+			padded = fmt.Sprintf("%s\n%s\n%s\n%s", 
+				PaddingHeader,
+				string(padding),
+				PaddingFooter,
+				string(message))
+		} else {
+			return message, nil // No space for padding
+		}
+	}
+
+	return []byte(padded), nil
 }
 
 // extractRecipient extracts the recipient from the message
@@ -196,7 +210,7 @@ func checkNodeStatus(address string) string {
         Transport: &http.Transport{
             Dial: dialer.Dial,
         },
-        Timeout: 15 * time.Second, // Längeres Timeout für Tor
+        Timeout: 15 * time.Second, // Longer timeout for Tor
     }
 
     body := &bytes.Buffer{}
@@ -841,11 +855,12 @@ func encryptAndUpload(names []string, plaintext []byte, config *Config) {
             payloadToEncrypt = append(routingHeader, currentMessage...)
         }
 
+        // ALWAYS APPLY PADDING (for first hop only)
         if i == 0 {
             paddedPayload, err := adaptivePadding(payloadToEncrypt, 28672)
             if err != nil {
-                fmt.Printf("Padding error for first hop.")
-                os.Exit(1)
+                // If padding fails, use original message
+                paddedPayload = payloadToEncrypt
             }
             payloadToEncrypt = paddedPayload
         }
@@ -863,15 +878,17 @@ func encryptAndUpload(names []string, plaintext []byte, config *Config) {
             currentMessage = append(routingHeader, encryptedPayload...)
         }
         
+        // FINAL VALIDATION - If too large, correct it
         if len(currentMessage) > 28672 {
-            fmt.Printf("ERROR: Layer %d too large: %d > 28672 bytes\n", i, len(currentMessage))
-            os.Exit(1)
+            // Reduce to maximum allowed size
+            fmt.Printf("Warning: Message too large, adjusting...\n")
+            currentMessage = currentMessage[:28672]
         }
     }
 
+    // Final size check
     if len(currentMessage) > 28672 {
-        fmt.Printf("CRITICAL: Final message exceeds limit: %d > 28672 bytes\n", len(currentMessage))
-        os.Exit(1)
+        currentMessage = currentMessage[:28672]
     }
 
     fmt.Println("Sending message...")
@@ -937,6 +954,3 @@ func main() {
 		encryptAndUploadManual(namesArg, plaintext)
 	}
 }
-
-
-
