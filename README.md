@@ -65,7 +65,7 @@ Each encryption layer contains:
 
 - **Routing Header**: `To: <next_hop_address>` specification (except outermost layer)  
 - **Encrypted Payload**: Next layer's complete encrypted message  
-- **Adaptive Padding**: Applied to plaintext layer for traffic analysis protection  
+- **Adaptive Client Padding**: Applied to plaintext layer for traffic analysis protection  
 
 ### Binary Message Format
 
@@ -356,5 +356,6 @@ XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk9
 Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk)     
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
