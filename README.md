@@ -8,11 +8,14 @@ Onion Courier is a production-ready anonymous communication system that implemen
 
 - **Strong Anonymity Guarantees**: Protection against both local and global adversaries
 - **Mixnet Architecture**: Decentralized network routing through multiple intermediary nodes  
-- **Forward Secrecy**: Automatic key rotation every 24 hours for pool encryption
+- **Forward Secrecy**: Automatic key rotation every 12 hours for pool encryption
 - **Cover Traffic Integration**: Systematic dummy message generation to obscure communication patterns  
 - **Timing Attack Protection**: Randomized delays and constant-time cryptographic operations  
 - **Replay Protection**: Cache-based message ID tracking with automatic expiration
-- **Tor Integration**: Operates exclusively over Tor hidden services for enhanced privacy  
+- **Tor Integration**: Operates exclusively over Tor hidden services for enhanced privacy
+- **Batch Processing**: Message batching with shuffling for traffic analysis resistance
+- **Fixed-Size Messages**: All messages 32KB in RAM to prevent size correlation attacks
+- **Encrypted Message IDs**: No metadata leakage in message identifiers
 
 ---
 
@@ -43,7 +46,7 @@ Onion Courier operates as a decentralized mix network where messages are routed 
 ### Symmetric Encryption & Forward Secrecy
 
 - **ChaCha20-Poly1305**: For internal message storage within mixnode pools with forward secrecy
-- **Automatic Key Rotation**: Pool encryption keys rotated every 24 hours
+- **Automatic Key Rotation**: Pool encryption keys rotated every 12 hours
 - **Dual-Key Support**: Support for both current and next keys during transition periods
 - **Nonce Generation**: 12-byte cryptographically random nonces for each encryption  
 - **Authentication**: 16-byte Poly1305 authentication tags ensuring message integrity  
@@ -54,16 +57,15 @@ Onion Courier operates as a decentralized mix network where messages are routed 
 
 ### Layered Encryption Structure
 
-Client → [Encryption Layer N] → Mixnode 1 (Pool + Delay) → [Encryption Layer N-1] → ... → Final Recipient
+Client → [Encryption Layer N] → Mixnode 1 (Batch Processing + Pool + Delay) → [Encryption Layer N-1] → ... → Final Recipient
 
-
-**Important**: All messages (including final recipients) go through the mixnet pool with randomized delays.
+**Important**: All messages (including final recipients) go through the mixnet pool with randomized delays and batch processing.
 
 Each encryption layer contains:
 
 - **Routing Header**: `To: <next_hop_address>` specification (except outermost layer)  
 - **Encrypted Payload**: Next layer's complete encrypted message  
-- **Structural Padding**: Applied only to plaintext layer for traffic analysis protection  
+- **Adaptive Padding**: Applied to plaintext layer for traffic analysis protection  
 
 ### Binary Message Format
 
@@ -73,7 +75,30 @@ The outermost layer transmitted to the first mix node follows this exact binary 
 [24 bytes - Encryption nonce]
 [N bytes - NaCl Box ciphertext with routing header and encrypted payload]
 
+---
 
+## Advanced Security Features
+
+### Batch Processing & Shuffling
+- **Batch Size**: 5-15 messages per batch for optimal anonymity
+- **Shuffling**: Cryptographically secure Fisher-Yates shuffle of batch messages
+- **Anonymity Set**: Up to 1.3 trillion possible message combinations per batch (15! permutations)
+- **Timeout**: 3-minute maximum batch formation time
+
+### Fixed-Size Message Protection
+- **All Pool Messages**: Exactly 32KB with cryptographically secure random padding
+- **RAM Analysis Protection**: Prevents message size correlation in memory
+- **Length Prefixing**: Original message length stored for accurate padding removal
+
+### Encrypted Message Identifiers
+- **Message IDs**: Generated and encrypted within message payload
+- **No Metadata Leakage**: External observers cannot correlate message IDs with content
+- **Replay Protection**: Separate external ID for replay cache using encrypted content hash
+
+### Enhanced Timing Protection
+- **Per-Message Delays**: 5-20 minute cryptographically secure random delays
+- **Batch Timeouts**: 3-minute maximum wait for batch formation
+- **Constant-Time Operations**: All cryptographic operations execute in constant time
 
 ---
 
@@ -84,21 +109,21 @@ The outermost layer transmitted to the first mix node follows this exact binary 
 | Parameter                  | Value                        |
 |---------------------------|------------------------------|
 | Maximum User Payload      | 20,480 bytes (20 KB)         |
-| Minimum Total Message Size| 1,024 bytes (1 KB)           |
-| Maximum Total Message Size| 25,600 bytes (25 KB)         |
-| Pool Message Storage Limit| 32,768 bytes (32 KB)         |
-| HTTP Upload Limit         | 28,672 bytes (28 KB)         |
+| Maximum Total Message Size| 28,672 bytes (28 KB)         |
+| Pool Message Storage Size | 32,768 bytes (32 KB) fixed   |
+| Fixed Padding Size        | 32,768 bytes (32 KB)         |
 | Encryption Overhead       | 56 bytes per layer           |
-| Number Of Hops Per Chain  | 1-5                          |
+| Number Of Hops Per Chain  | 2-5                          |
 
 ### Mixnode Operational Parameters
 
 - **Maximum Pool Capacity**: 400 messages  
 - **Minimum Delivery Delay**: 5 minutes (300 seconds)  
 - **Maximum Delivery Delay**: 20 minutes (1,200 seconds)  
-- **Pool Maintenance Interval**: 60-second cleanup cycles  
-- **Key Rotation Interval**: 24 hours for forward secrecy
+- **Batch Processing**: 5-15 messages with 3-minute timeout
+- **Key Rotation Interval**: 12 hours for forward secrecy
 - **Replay Cache Expiration**: 30 minutes with 5-minute cleanup
+- **Rate Limiting**: 30 requests per 30 seconds per IP
 
 ---
 
@@ -175,14 +200,15 @@ $ ./ocmix-client -c
 ## Ping mix nodes to see their status  
 $ ./ocmix-client -p  
 ```
-Checking mix node status via Tor...  
+Checking mix node status via Tor...
 
-bob                     OK  
-hal                     OK  
-len                     OK  
-ulf                     OK  
-wau                     OK
+bob OK
+hal OK
+len OK
+ulf OK
+wau OK
 ```
+
 If you are a respected member of a privacy community and would  
 like your public mix node been listed, just mail me the public key  
 and mix node address along with the nickname of your mix node to:  
@@ -199,7 +225,7 @@ $ ./ocsend-client address:port < file
 
 ## Security Features
 **Forward Secrecy**
-**Automatic Key Rotation:** Pool encryption keys rotated every 24 hours
+**Automatic Key Rotation:** Pool encryption keys rotated every 12 hours
 
 **Dual-Key Support:** Support for current + next key during transition periods
 
@@ -219,6 +245,19 @@ Randomized Delays: 5-20 minute random delays per hop using cryptographic RNG
 
 **Timing Obfuscation:** Cryptographically secure random delays for responses
 
+**Batch Processing:** Message batching with shuffling breaks timing correlations
+
+**Advanced Anonymity Features:**
+**Batch Processing:** 5-15 messages per batch with secure shuffling
+
+**Fixed-Size Messages:** All pool messages exactly 32KB to prevent RAM analysis
+
+**Encrypted Message IDs:** No metadata leakage in message identifiers
+
+**Traffic Analysis Resistance:** Batch shuffling creates 1.3 trillion possible combinations
+
+**Size Correlation Protection:** Fixed padding prevents message size tracking
+
 ## Anonymity Guarantees
 **Sender Anonymity:** Hidden among multiple legitimate users and cover traffic sources
 
@@ -230,18 +269,24 @@ Randomized Delays: 5-20 minute random delays per hop using cryptographic RNG
 
 **Global Adversary Protection:** Mixnet architecture protects against network-wide surveillance
 
-## Attack Resistance
-**Traffic Analysis Resistance:** Outer-layer padding and cover traffic
+**Traffic Analysis Resistance:** Batch processing and shuffling break message correlations
 
-**Timing Attack Mitigation:** Randomized delays and constant-time operations
+## Attack Resistance
+**Traffic Analysis Resistance:** Batch processing, shuffling, and adaptive padding
+
+**Timing Attack Mitigation:** Randomized delays and batch timeouts
 
 **Partial Node Compromise:** Forward secrecy protects older messages
 
-**Size Correlation Protection:** Adaptive padding prevents message size tracking
+**Size Correlation Protection:** Fixed 32KB messages prevent RAM analysis
 
 **Replay Attack Prevention:** Cache-based message ID tracking
 
 **Network Analysis:** Tor hidden services + mixnet provide layered protection
+
+**RAM Analysis Protection:** All messages identical 32KB size in memory
+
+**Metadata Protection:** Encrypted message IDs prevent correlation attacks
 
 ## Network Protocol - HTTP API Endpoints
 Mixnodes
@@ -261,27 +306,30 @@ Format: Accepts both multipart/form-data and raw POST data
 Response: Always "OK" for consistent responses
 
 Message Flow
-All messages (including final recipients) go through the mixnet pool with randomized delays:
+All messages go through enhanced mixnet processing:
 
-Client → Mixnode 1 (Pool + 5-20min Delay) → Mixnode 2 (Pool + 5-20min Delay) → Final Recipient
+Client → Mixnode 1 (Batch Processing + Pool + 5-20min Delay) → Mixnode 2 (Batch Processing + Pool + 5-20min Delay) → Final Recipient
 
 Pool Management
-Individual Scheduling: Each message has individual random delay
+**Batch Processing:** 5-15 messages with 3-minute timeout and secure shuffling
 
-Emergency Batch: On pool overflow, 33% of messages sent immediately with secure randomization
+**Individual Scheduling:** Each message has individual random delay after batch processing
 
-Secure Randomization: Cryptographically secure random selection for batches
+**Fixed-Size Storage:** All messages stored as exactly 32KB in pool
+
+**Secure Randomization:** Cryptographically secure random selection and shuffling
 
 ## Threat Model
 ### Protected Against  
-**Traffic Analysis:** Through padding and cover traffic  
-**Timing Attacks:** Through randomized delays and constant-time operations  
+**Traffic Analysis:** Through batch processing, shuffling, and adaptive padding  
+**Timing Attacks:** Through randomized delays and batch timeouts  
 **Replay Attacks:** Through message-ID cache with expiration  
 **Node Compromise:** Forward secrecy protects older messages  
-**Size Correlation:** Adaptive padding prevents size analysis  
+**Size Correlation:** Fixed 32KB messages prevent RAM analysis  
 **Partial Network Observation:** Mixnet architecture provides unlinkability  
 **Global Adversary:** Multi-hop routing breaks end-to-end correlation  
-**Metadata Analysis:** No persistent metadata retention  
+**Metadata Analysis:** Encrypted message IDs prevent correlation  
+**RAM Analysis:** Fixed-size messages prevent memory analysis  
 
 ### Security Assumptions  
 Tor Hidden Services provide sufficient network-level anonymity  
@@ -298,46 +346,13 @@ patrickmn/go-cache: In-memory cache for replay protection
 
 ## --
 If you like the idea of an own privately run Onion Courier Mixnet,    
-as much as I do, consider a small donation.    
-```  
+as much as I do, consider a small donation.  
+```
 BTC: 129yB8kL8mQVZufNS4huajsdJPa48aHwHz  
 Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys  
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
-Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk) 
+
+Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk)     
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
