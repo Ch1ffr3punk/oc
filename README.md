@@ -149,9 +149,9 @@ Key pair generated: public.pem and private.pem
 ## Start mix node server
 $ ./ocmix-server -s private.pem  
 2025/10/04 11:34:55 🧅 Onion Courier mix node running 🚀  
-Press CTRL-Z, press Enter   
-Type 'bg', press Enter   
-Type 'logout', press Enter    
+Press CTRL-Z   
+Type 'bg'  
+Type 'logout'  
 
 ## Download configuration (keys and mix nodes)
 $ ./ocmix-client -i  
@@ -356,6 +356,7 @@ XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk9
 Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk)     
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
