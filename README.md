@@ -111,9 +111,9 @@ The outermost layer transmitted to the first mix node follows this exact binary 
 | Maximum User Payload      | 20,480 bytes (20 KB)         |
 | Maximum Total Message Size| 28,672 bytes (28 KB)         |
 | Pool Message Storage Size | 32,768 bytes (32 KB) fixed   |
-| Fixed Padding Size        | 32,768 bytes (32 KB)         |
+| Fixed Padding Size In Pool| 32,768 bytes (32 KB)         |
 | Encryption Overhead       | 56 bytes per layer           |
-| Number Of Hops Per Chain  | 2-5                          |
+| Number Of Hops Per Chain  | 1-5                          |
 
 ### Mixnode Operational Parameters
 
@@ -356,4 +356,5 @@ XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk9
 Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk)     
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
