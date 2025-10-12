@@ -1,12 +1,9 @@
-// Onion Courier client for sending files directly
-// to ochome server, base64 encoded, without using
-// the Mixnet
+// Onion Courier client for sending files directly to ochome server
 
 package main
 
 import (
 	"bytes"
-	"encoding/base64"
 	"fmt"
 	"io"
 	"net/http"
@@ -40,7 +37,8 @@ func main() {
 }
 
 func uploadFile(serverURL string) error {
-	// Daten von stdin lesen
+	startTime = time.Now()
+
 	data, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return fmt.Errorf("failed to read from stdin: %w", err)
@@ -50,10 +48,6 @@ func uploadFile(serverURL string) error {
 		return fmt.Errorf("no data received from stdin")
 	}
 
-	startTime = time.Now()
-
-	encodedData := base64.StdEncoding.EncodeToString(data)
-	
 	dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:9050", nil, proxy.Direct)
 	if err != nil {
 		return fmt.Errorf("can't connect to the Tor proxy: %v", err)
@@ -67,13 +61,12 @@ func uploadFile(serverURL string) error {
 		Timeout:   30 * time.Second,
 	}
 
-	request, err := http.NewRequest("POST", serverURL, strings.NewReader(encodedData))
+	request, err := http.NewRequest("POST", serverURL, bytes.NewReader(data))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 	
-	request.Header.Set("Content-Type", "text/plain")
-	request.Header.Set("X-Content-Encoding", "base64")
+	request.Header.Set("Content-Type", "application/octet-stream")
 
 	fmt.Print("Starting file transfer...\n")
 
@@ -83,7 +76,6 @@ func uploadFile(serverURL string) error {
 	}
 	defer response.Body.Close()
 
-	// Server Response lesen
 	responseBody, _ := io.ReadAll(response.Body)
 
 	if response.StatusCode != http.StatusOK {
@@ -94,21 +86,6 @@ func uploadFile(serverURL string) error {
 	fmt.Printf("\rFile transfer successful! Elapsed Time: %s\n", formatDuration(elapsedTime))
 
 	return nil
-}
-
-func insertLineBreaks(data []byte, lineLength int) []byte {
-	var result bytes.Buffer
-	for i := 0; i < len(data); i += lineLength {
-		end := i + lineLength
-		if end > len(data) {
-			end = len(data)
-		}
-		result.Write(data[i:end])
-		if end < len(data) {
-			result.WriteString("\n")
-		}
-	}
-	return result.Bytes()
 }
 
 func formatDuration(d time.Duration) string {
