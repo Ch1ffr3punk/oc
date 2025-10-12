@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/smtp"
@@ -42,27 +42,10 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var content []byte
-	var err error
-
-	contentType := r.Header.Get("Content-Type")
-	if contentType != "" && contentType != "application/octet-stream" {
-		if err := r.ParseMultipartForm(10 << 20); err == nil {
-			if fileHeader := r.MultipartForm.File["file"]; len(fileHeader) > 0 {
-				file, err := fileHeader[0].Open()
-				if err == nil {
-					defer file.Close()
-					content, err = ioutil.ReadAll(file)
-				}
-			}
-		}
-	}
-
-	if content == nil {
-		content, err = ioutil.ReadAll(r.Body)
-		if err != nil {
-			return
-		}
+	// Read raw binary data
+	content, err := io.ReadAll(io.LimitReader(r.Body, 10<<20))
+	if err != nil {
+		return
 	}
 	defer r.Body.Close()
 
@@ -70,12 +53,18 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Normalize line endings and forward (NO header modification)
 	normalized := normalizeLineEndings(content)
 	forwardViaEmail(normalized)
 }
 
 func forwardViaEmail(message []byte) {
-	from := "anonymous"
+	// Extract sender FROM THE MESSAGE
+	sender := extractSender(message)
+	if sender == "" {
+		sender = "anonymous@anonymous.invalid"
+	}
+	
 	to := "mail2news@dizum.com"
 	host := "smtp.dizum.com"
 	port := ":2525"
@@ -99,7 +88,8 @@ func forwardViaEmail(message []byte) {
 		return
 	}
 
-	if err = smtpClient.Mail(from); err != nil {
+	// Use the sender FROM THE MESSAGE
+	if err = smtpClient.Mail(sender); err != nil {
 		return
 	}
 	if err = smtpClient.Rcpt(to); err != nil {
@@ -118,6 +108,29 @@ func forwardViaEmail(message []byte) {
 	if err != nil {
 		return
 	}
+}
+
+func extractSender(message []byte) string {
+	scanner := bufio.NewScanner(bytes.NewReader(message))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(strings.ToLower(line), "from:") {
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) == 2 {
+				fromField := strings.TrimSpace(parts[1])
+				if idx := strings.Index(fromField, "<"); idx != -1 {
+					if idx2 := strings.Index(fromField, ">"); idx2 != -1 {
+						return strings.TrimSpace(fromField[idx+1 : idx2])
+					}
+				}
+				return strings.TrimSpace(fromField)
+			}
+		}
+		if line == "" {
+			break
+		}
+	}
+	return ""
 }
 
 func dialSMTP(dialer proxy.Dialer, host, port string) (*smtp.Client, error) {
