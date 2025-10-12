@@ -1,11 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"crypto/rand"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"math/big"
 	"net/http"
@@ -18,7 +17,6 @@ const (
 	alphanumeric   = "abcdefghijklmnopqrstuvwxyz0123456789"
 	filenameLength = 12
 	defaultInbox   = "inbox"
-	crlf           = "\r\n"
 )
 
 var (
@@ -50,13 +48,6 @@ func generateRandomFilename(length int) (string, error) {
 	return string(b), nil
 }
 
-func normalizeLineEndings(data []byte) []byte {
-	data = bytes.ReplaceAll(data, []byte("\r\n"), []byte("\n"))
-	data = bytes.ReplaceAll(data, []byte("\r"), []byte("\n"))
-	data = bytes.ReplaceAll(data, []byte("\n"), []byte(crlf))
-	return data
-}
-
 func handleUpload(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		randomDelay := time.Duration(time.Now().UnixNano()%5000+1000) * time.Millisecond
@@ -69,28 +60,11 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var content []byte
-	var err error
-
-	contentType := r.Header.Get("Content-Type")
-	if contentType != "" && contentType != "application/octet-stream" {
-		if err := r.ParseMultipartForm(10 << 20); err == nil {
-			if fileHeader := r.MultipartForm.File["file"]; len(fileHeader) > 0 {
-				file, err := fileHeader[0].Open()
-				if err == nil {
-					defer file.Close()
-					content, err = ioutil.ReadAll(file)
-				}
-			}
-		}
-	}
-
-	if content == nil {
-		content, err = ioutil.ReadAll(r.Body)
-		if err != nil {
-			log.Printf("Error reading raw body: %v", err)
-			return
-		}
+	content, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error reading body: %v", err)
+		http.Error(w, "Error reading body", http.StatusBadRequest)
+		return
 	}
 	defer r.Body.Close()
 
@@ -99,20 +73,16 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	normalized := normalizeLineEndings(content)
-	savePlainTextMessage(normalized)
-}
-
-func savePlainTextMessage(data []byte) {
 	filename, err := generateRandomFilename(filenameLength)
 	if err != nil {
 		filename = fmt.Sprintf("%d", time.Now().UnixNano())
 	}
 
 	fullPath := filepath.Join(inboxPath, filename)
-	if err := ioutil.WriteFile(fullPath, data, 0600); err != nil {
+	if err := os.WriteFile(fullPath, content, 0600); err != nil {
 		log.Printf("Error saving file: %v", err)
+		http.Error(w, "Error saving file", http.StatusInternalServerError)
 	} else {
-		log.Printf("Message saved: %s (%d bytes)", fullPath, len(data))
+		log.Printf("File saved: %s (%d bytes)", fullPath, len(content))
 	}
 }
