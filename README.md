@@ -294,14 +294,12 @@ Port: 8080
 
 Endpoint: POST /upload
 
-Format: multipart/form-data with field file
-
 Response: Always "OK" with random timing
 
 Final Recipients
 Port: 8088 (or other service port)
 
-Format: Accepts both multipart/form-data and raw POST data
+Format: Accepts raw POST data
 
 Response: Always "OK" for consistent responses
 
@@ -356,6 +354,7 @@ XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk9
 Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk)     
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
