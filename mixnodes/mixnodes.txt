@@ -10,8 +10,6 @@ kruezafj3q6p7z5x4c7mjdvxz225mfprto7k4bymdkxv5qzzsamywdyd.onion:8080
 ulf
 5s6chpom2x77gl5pehdea3jrone46r5vqs5p4u2rhhneutzsp4fvzsqd.onion:8080
 
-vic
-2wvawpf2gsnkn5phdnvfej54ixmc4ijykx757vkxztowaadrtn7da7yd.onion:8080
-
 wau
 ogoxiclsat3lzupmdgxo7ctmfmuikep2sspuym57qngm3bxs4n6koeyd.onion:8080
+
