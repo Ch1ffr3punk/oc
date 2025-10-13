@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/tls"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"net/smtp"
+	"strings"
 	"time"
 
 	"golang.org/x/net/proxy"
@@ -62,7 +64,7 @@ func forwardViaEmail(message []byte) {
 	// Extract sender FROM THE MESSAGE
 	sender := extractSender(message)
 	if sender == "" {
-		sender = "anonymous@anonymous.invalid"
+		sender = "bounce.me@onion-courier.mix"
 	}
 	
 	to := "mail2news@dizum.com"
