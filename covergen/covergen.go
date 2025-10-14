@@ -262,7 +262,7 @@ func selectRandomChain(fixedChain string, mixnodes []MixnodeEntry) string {
 		return fixedChain
 	}
 
-	length := secureRandInt(3) + 2 // 2-4 hops
+	length := secureRandInt(4) + 2 // 2-5 hops
 
 	availableNodes := make([]string, len(mixnodes))
 	for i, node := range mixnodes {
@@ -702,3 +702,4 @@ func hasDuplicates(names []string) bool {
 	}
 	return false
 }
+
