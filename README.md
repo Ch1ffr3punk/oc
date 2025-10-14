@@ -30,7 +30,7 @@ Onion Courier operates as a decentralized mix network where messages are routed 
 - **Mixnode Server**: Go-based concurrent server implementation with forward secrecy
 - **Command-Line Client**: POSIX-compliant command-line interface  
 - **Cover Traffic Daemon**: Automated dummy message generation system (available upon request)  
-- **Endpoint Server**: For receiving messages from the Mixnet 
+- **Endpoint Server**: For receiving messages from the Mixnet or directly with ocsend-client  
 
 ---
 
@@ -354,6 +354,7 @@ XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk9
 Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk)     
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
