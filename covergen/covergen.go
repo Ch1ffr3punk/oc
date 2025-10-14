@@ -405,6 +405,7 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
 }
 
 // encryptForChainSecure builds encrypted onion message for multi-node chain
+// encryptForChainSecure builds encrypted onion message for multi-node chain
 func encryptForChainSecure(plaintext string, nodes []string, pubKeys []KeyEntry, mixnodes []MixnodeEntry) (string, error) {
     currentMessage := []byte(plaintext)
 
@@ -437,6 +438,15 @@ func encryptForChainSecure(plaintext string, nodes []string, pubKeys []KeyEntry,
             nextHop = nextMixnode.Address
         }
 
+        // Calculate available space for this layer
+        availableSpace := MaxTotalSize
+        
+        // For outer layers, account for routing header that will be added later
+        if i == 0 {
+            routingHeaderSize := len("To: " + nextHop + "\n\n")
+            availableSpace -= routingHeaderSize
+        }
+
         // Construct payload for this layer
         var payloadToEncrypt []byte
         
@@ -449,13 +459,24 @@ func encryptForChainSecure(plaintext string, nodes []string, pubKeys []KeyEntry,
             payloadToEncrypt = append(routingHeader, currentMessage...)
         }
 
+        // Apply padding only to outermost layer (i == 0)
         if i == 0 {
-            paddedPayload, err := adaptivePadding(payloadToEncrypt, MaxTotalSize)
+            paddedPayload, err := adaptivePadding(payloadToEncrypt, availableSpace)
             if err != nil {
-                // If padding fails, use original payload
+                // If padding fails, use original payload but ensure it fits
+                if len(payloadToEncrypt) > availableSpace {
+                    return "", fmt.Errorf("payload too large for padding: %d > %d", 
+                        len(payloadToEncrypt), availableSpace)
+                }
                 paddedPayload = payloadToEncrypt
             }
             payloadToEncrypt = paddedPayload
+        }
+
+        // Validate payload size before encryption
+        if len(payloadToEncrypt) > availableSpace {
+            return "", fmt.Errorf("payload before encryption too large: %d > %d bytes", 
+                len(payloadToEncrypt), availableSpace)
         }
 
         // Encrypt payload for current node
@@ -472,7 +493,7 @@ func encryptForChainSecure(plaintext string, nodes []string, pubKeys []KeyEntry,
             currentMessage = encryptedPayload
         }
 
-        // Size validation
+        // Final size validation
         if len(currentMessage) > MaxTotalSize {
             return "", fmt.Errorf("layer %d too large: %d > %d bytes", 
                 i, len(currentMessage), MaxTotalSize)
@@ -702,4 +723,3 @@ func hasDuplicates(names []string) bool {
 	}
 	return false
 }
-
