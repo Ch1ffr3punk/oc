@@ -161,17 +161,16 @@ Config directory: oc
 ✓ Pubkeys file created: oc/pubring.txt  
 Configuration updated successfully!   
 
-## Create your message for an endpoint server
-To: vztrzrdafvnjegctrltkv6azyrjqawqmrwnhe7kvaqnj5vvnwhoiq7id.onion:8088
+## Create your message for an endpoint server  
 
-Hello World!
+To: vztrzrdafvnjegctrltkv6azyrjqawqmrwnhe7kvaqnj5vvnwhoiq7id.onion:8088  
 
-Regards  
-Bob
+Hello World!  
 
-Please note: The endpoint server will remove the first  To: header and  
-the blank line following. Keep that in mind if you create messages for  
-clearnet emails or Usenet, so that they look like this:    
+Regards   
+Bob  
+
+or  
 
 To: ugf7olo27n5nq2jr6yoai2j5jo24ogx6yemjaozsgxg3byfpcpwdg7id.onion:8088  
 
@@ -354,6 +353,7 @@ XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk9
 Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk)     
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
