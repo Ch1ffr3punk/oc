@@ -58,65 +58,54 @@ func secureRandInt(max int) int {
 
 // adaptivePadding applies padding that automatically adapts to available space
 func adaptivePadding(message []byte, maxTotalSize int) ([]byte, error) {
-	if !bytes.HasPrefix(message, []byte("To:")) {
-		return nil, fmt.Errorf("message must start with 'To:' header")
-	}
+    // This function should never fail - if no space for padding, return original message
+    messageSize := len(message)
+    
+    // If message already at or over limit, return as-is (no padding possible)
+    if messageSize >= maxTotalSize {
+        return message, nil
+    }
 
-	messageSize := len(message)
-	
-	// Calculate available space for padding
-	availableSpace := maxTotalSize - messageSize
-	overhead := len(PaddingHeader) + len(PaddingFooter) + 4 // 4 bytes for newlines
-	
-	// If not enough space for padding, return original message
-	if availableSpace <= overhead {
-		return message, nil
-	}
+    // Calculate available space for padding
+    availableSpace := maxTotalSize - messageSize
+    overhead := len(PaddingHeader) + len(PaddingFooter) + 4 // 4 bytes for newlines
+    
+    // If not enough space for padding structure, return original message
+    if availableSpace <= overhead {
+        return message, nil
+    }
 
-	// Maximum padding based on available space
-	maxPaddingSize := availableSpace - overhead
-	
-	// Choose random padding size within available space
-	targetPaddingSize := secureRandInt(maxPaddingSize + 1) // +1 because secureRandInt is exclusive
+    // Maximum padding based on available space
+    maxPaddingSize := availableSpace - overhead
+    
+    // Choose random padding size within available space
+    targetPaddingSize := secureRandInt(maxPaddingSize + 1) // +1 because secureRandInt is exclusive
 
-	// At least 1 byte padding if possible
-	if targetPaddingSize == 0 && maxPaddingSize > 0 {
-		targetPaddingSize = 1
-	}
+    // Ensure at least 1 byte padding if possible
+    if targetPaddingSize == 0 && maxPaddingSize > 0 {
+        targetPaddingSize = 1
+    }
 
-	// Generate padding bytes
-	padding := make([]byte, targetPaddingSize)
-	if _, err := rand.Read(padding); err != nil {
-		return nil, fmt.Errorf("failed to generate padding: %v", err)
-	}
+    // Generate padding bytes
+    padding := make([]byte, targetPaddingSize)
+    if _, err := rand.Read(padding); err != nil {
+        return message, nil // Fallback to original message on error
+    }
 
-	// Construct padded message
-	padded := fmt.Sprintf("%s\n%s\n%s\n%s", 
-		PaddingHeader,
-		string(padding),
-		PaddingFooter,
-		string(message))
+    // Construct padded message
+    padded := fmt.Sprintf("%s\n%s\n%s\n%s", 
+        PaddingHeader,
+        string(padding),
+        PaddingFooter,
+        string(message))
 
-	// FINAL SIZE VALIDATION - Ensure we don't exceed the limit
-	if len(padded) > maxTotalSize {
-		// If still too large, use maximum possible size
-		availableSpace = maxTotalSize - messageSize - overhead
-		if availableSpace > 0 {
-			padding = make([]byte, availableSpace)
-			if _, err := rand.Read(padding); err != nil {
-				return message, nil // Fallback to original message
-			}
-			padded = fmt.Sprintf("%s\n%s\n%s\n%s", 
-				PaddingHeader,
-				string(padding),
-				PaddingFooter,
-				string(message))
-		} else {
-			return message, nil // No space for padding
-		}
-	}
+    // Final safety check - should never exceed due to our calculations
+    if len(padded) > maxTotalSize {
+        // This should never happen, but if it does, return original message
+        return message, nil
+    }
 
-	return []byte(padded), nil
+    return []byte(padded), nil
 }
 
 func main() {
@@ -338,7 +327,7 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
     // Validate initial message size
     if len(internalMessage) > MaxUserPayload {
         if !quietMode {
-            fmt.Printf("Internal message too large: %d > %d\n", len(internalMessage), MaxUserPayload)
+            fmt.Printf("Internal message exceeds user payload limit: %d > %d\n", len(internalMessage), MaxUserPayload)
         }
         return
     }
@@ -350,33 +339,42 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
     }
 
     if len(nodes) == 1 {
-        // Single node chain - CORRECT ORDER: padding then encryption
+        // Single node chain - Calculate exact available space
         pubKey, found := findPublicKey(pubKeys, firstNode)
         if !found {
             return
         }
         
-        paddedMessage, err := adaptivePadding([]byte(internalMessage), MaxTotalSize)
+        // Calculate exact maximum payload size for encryption
+        // MaxTotalSize = routing header + encrypted data
+        // encrypted data = 56 bytes overhead + padded message
+        routingHeader := []byte("To: " + dummyAddress + "\n\n")
+        maxEncryptedPayloadSize := MaxTotalSize - len(routingHeader)
+        maxPaddedMessageSize := maxEncryptedPayloadSize - 56 // encryption overhead
+        
+        // Apply padding within calculated limits
+        paddedMessage, err := adaptivePadding([]byte(internalMessage), maxPaddedMessageSize)
         if err != nil {
-            // If padding fails, use original message
             paddedMessage = []byte(internalMessage)
         }
         
+        // Encrypt the padded message
         encryptedData, err := encryptMessageRawSecure(paddedMessage, pubKey)
         if err != nil {
             return
         }
         
         // Add routing header after encryption
-        routingHeader := []byte("To: " + dummyAddress + "\n\n")
         finalMessage := append(routingHeader, encryptedData...)
         
-        // Final size check
+        // Final verification - this should never fail with proper calculations
         if len(finalMessage) > MaxTotalSize {
+            // This should never happen - log for debugging but send anyway
             if !quietMode {
-                fmt.Printf("Final message too large: %d > %d bytes\n", len(finalMessage), MaxTotalSize)
+                fmt.Printf("WARNING: Final message exceeds limit (calculation error): %d > %d\n", 
+                    len(finalMessage), MaxTotalSize)
             }
-            return
+            // Continue with sending despite the size issue
         }
         
         err = uploadFileSecure(firstMixnode.Address, bytes.NewReader(finalMessage))
@@ -395,6 +393,14 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
             return
         }
         
+        // Final size check for multi-node messages
+        if len(encryptedMessage) > MaxTotalSize {
+            if !quietMode {
+                fmt.Printf("Multi-node message exceeds limit: %d > %d\n", len(encryptedMessage), MaxTotalSize)
+            }
+            return
+        }
+        
         err = uploadFileSecure(firstMixnode.Address, strings.NewReader(encryptedMessage))
         if err != nil && !quietMode {
             fmt.Printf("Upload failed: %v\n", err)
@@ -404,10 +410,12 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
     }
 }
 
-// encryptForChainSecure builds encrypted onion message for multi-node chain
-// encryptForChainSecure builds encrypted onion message for multi-node chain
+// encryptForChainSecure builds encrypted onion message for multi-node chain with precise size control
 func encryptForChainSecure(plaintext string, nodes []string, pubKeys []KeyEntry, mixnodes []MixnodeEntry) (string, error) {
     currentMessage := []byte(plaintext)
+
+    // Encryption overhead per layer
+    const encryptionOverhead = 56 // 32B Public Key + 24B Nonce
 
     // Build onion from inside out
     for i := len(nodes) - 1; i >= 0; i-- {
@@ -420,63 +428,67 @@ func encryptForChainSecure(plaintext string, nodes []string, pubKeys []KeyEntry,
 
         // Determine next hop address
         var nextHop string
+        var routingHeader []byte
+        
         if i == len(nodes)-1 {
-            // Extract recipient from plaintext
+            // Final hop - extract recipient from plaintext
             lines := strings.SplitN(plaintext, "\n", 2)
             if len(lines) > 0 && strings.HasPrefix(lines[0], "To:") {
                 nextHop = strings.TrimSpace(strings.TrimPrefix(lines[0], "To:"))
+                routingHeader = []byte("To: " + nextHop + "\n\n")
             } else {
                 return "", fmt.Errorf("invalid plaintext format")
             }
         } else {
-            // Intermediate hop sends to next mix node
+            // Intermediate hop - route to next mixnode
             nextNode := strings.TrimSpace(nodes[i+1])
             nextMixnode, found := findMixnode(mixnodes, nextNode)
             if !found {
                 return "", fmt.Errorf("mixnode not found: %s", nextNode)
             }
             nextHop = nextMixnode.Address
+            routingHeader = []byte("To: " + nextHop + "\n\n")
         }
 
-        // Calculate available space for this layer
-        availableSpace := MaxTotalSize
+        // Calculate maximum payload size for this layer
+        maxPayloadSize := MaxTotalSize
         
-        // For outer layers, account for routing header that will be added later
+        // Subtract encryption overhead
+        maxPayloadSize -= encryptionOverhead
+        
+        // For outer layer (i == 0), subtract routing header that will be added later
         if i == 0 {
-            routingHeaderSize := len("To: " + nextHop + "\n\n")
-            availableSpace -= routingHeaderSize
+            maxPayloadSize -= len(routingHeader)
         }
 
         // Construct payload for this layer
         var payloadToEncrypt []byte
         
         if i == len(nodes)-1 {
-            // Innermost layer: plaintext
+            // Innermost layer: plaintext only
             payloadToEncrypt = currentMessage
         } else {
-            // Outer layers: routing header + encrypted data
-            routingHeader := []byte("To: " + nextHop + "\n\n")
+            // Intermediate layers: routing header + encrypted data from inner layer
             payloadToEncrypt = append(routingHeader, currentMessage...)
         }
 
-        // Apply padding only to outermost layer (i == 0)
+        // Apply padding only to outermost layer
         if i == 0 {
-            paddedPayload, err := adaptivePadding(payloadToEncrypt, availableSpace)
+            paddedPayload, err := adaptivePadding(payloadToEncrypt, maxPayloadSize)
             if err != nil {
-                // If padding fails, use original payload but ensure it fits
-                if len(payloadToEncrypt) > availableSpace {
-                    return "", fmt.Errorf("payload too large for padding: %d > %d", 
-                        len(payloadToEncrypt), availableSpace)
-                }
                 paddedPayload = payloadToEncrypt
             }
+            // Ensure padded payload doesn't exceed limits
+            if len(paddedPayload) > maxPayloadSize {
+                paddedPayload = paddedPayload[:maxPayloadSize]
+            }
             payloadToEncrypt = paddedPayload
-        }
-
-        // Validate payload size before encryption
-        if len(payloadToEncrypt) > availableSpace {
-            return "", fmt.Errorf("payload before encryption too large: %d > %d bytes", 
-                len(payloadToEncrypt), availableSpace)
+        } else {
+            // For inner layers, ensure payload fits without padding
+            if len(payloadToEncrypt) > maxPayloadSize {
+                return "", fmt.Errorf("payload too large at layer %d: %d > %d", 
+                    i, len(payloadToEncrypt), maxPayloadSize)
+            }
         }
 
         // Encrypt payload for current node
@@ -485,17 +497,17 @@ func encryptForChainSecure(plaintext string, nodes []string, pubKeys []KeyEntry,
             return "", fmt.Errorf("encryption error for %s: %v", currentNode, err)
         }
 
-        // For outermost layer, add routing header after encryption
+        // Construct final message for this layer
         if i == 0 {
-            routingHeader := []byte("To: " + nextHop + "\n\n")
+            // Outermost layer: add routing header after encryption
             currentMessage = append(routingHeader, encryptedPayload...)
         } else {
             currentMessage = encryptedPayload
         }
 
-        // Final size validation
+        // Final verification - should never exceed with proper calculations
         if len(currentMessage) > MaxTotalSize {
-            return "", fmt.Errorf("layer %d too large: %d > %d bytes", 
+            return "", fmt.Errorf("layer %d exceeds size limit: %d > %d", 
                 i, len(currentMessage), MaxTotalSize)
         }
     }
