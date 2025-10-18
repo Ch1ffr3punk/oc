@@ -298,6 +298,17 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
     if chain == "" {
         return
     }
+	
+    // Generate random payload with guaranteed size limits
+    size := secureRandInt(maxSize-minSize+1) + minSize
+
+    // Ensure size is within absolute limits
+    if size > MaxUserPayload {
+        size = MaxUserPayload
+    }
+    if size < 1 {
+        size = 1
+    }
 
     // Ensure message size limits match main client
     if minSize < 1 {
@@ -313,7 +324,7 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
     }
 
     // Generate random payload
-    size := secureRandInt(maxSize-minSize+1) + minSize
+    _ = secureRandInt(maxSize-minSize+1) + minSize
     randomBytes := make([]byte, size)
     _, err := rand.Read(randomBytes)
     if err != nil {
