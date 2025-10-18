@@ -371,29 +371,32 @@ func encryptAndUploadRandom(plaintext []byte) {
 
 // sendDummyTraffic sends a single cover message
 func sendDummyTraffic() {
-	config, err := loadConfig()
-	if err != nil {
-		fmt.Printf("Error loading configuration: %v\n", err)
-		os.Exit(1)
-	}
+    config, err := loadConfig()
+    if err != nil {
+        fmt.Printf("Error loading configuration: %v\n", err)
+        os.Exit(1)
+    }
 
-	mixnodes, err := loadMixnodeAddresses(config.MixnodesFile)
-	if err != nil {
-		fmt.Printf("Error loading mix node addresses: %v\n", err)
-		os.Exit(1)
-	}
+    mixnodes, err := loadMixnodeAddresses(config.MixnodesFile)
+    if err != nil {
+        fmt.Printf("Error loading mix node addresses: %v\n", err)
+        os.Exit(1)
+    }
 
-	if len(mixnodes) < 1 {
-		fmt.Printf("No mix nodes available for cover traffic\n")
-		os.Exit(1)
-	}
+    if len(mixnodes) < 1 {
+        fmt.Printf("No mix nodes available for cover traffic\n")
+        os.Exit(1)
+    }
 
-	fmt.Println("Sending message...")
-	err = sendSingleDummyMessage(config, mixnodes, 1)
-	if err != nil {
-		fmt.Printf("Error sending cover message: %v\n", err)
-		os.Exit(1)
-	}
+    fmt.Println("Sending cover message...")
+    err = sendSingleDummyMessage(config, mixnodes, 1)
+    if err != nil {
+        fmt.Printf("Error sending cover message: %v\n", err)
+        os.Exit(1)
+    }
+    
+    fmt.Println("Cover message sent successfully!")
+    os.Exit(0)
 }
 
 // sendSingleDummyMessage sends one dummy message through a random chain
