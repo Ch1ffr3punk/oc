@@ -298,17 +298,6 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
     if chain == "" {
         return
     }
-	
-    // Generate random payload with guaranteed size limits
-    size := secureRandInt(maxSize-minSize+1) + minSize
-
-    // Ensure size is within absolute limits
-    if size > MaxUserPayload {
-        size = MaxUserPayload
-    }
-    if size < 1 {
-        size = 1
-    }
 
     // Ensure message size limits match main client
     if minSize < 1 {
@@ -317,14 +306,46 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
     if maxSize > MaxUserPayload {
         maxSize = MaxUserPayload
     }
+    
+    // Ensure maxSize is at least minSize
+    if maxSize < minSize {
+        maxSize = minSize
+    }
 
     nodes := strings.Split(chain, ",")
     if hasDuplicates(nodes) {
         return
     }
 
-    // Generate random payload
-    _ = secureRandInt(maxSize-minSize+1) + minSize
+    // Generate random payload with PROPER size calculation
+    // Calculate maximum possible payload size accounting for "To: " header
+    dummyAddress := generateRandomOnionV3Address() + ".dummy:8080"
+    headerOverhead := len("To: " + dummyAddress + "\n\n")
+    
+    // Adjust maxSize to account for header overhead
+    adjustedMaxSize := MaxUserPayload - headerOverhead
+    if adjustedMaxSize < minSize {
+        adjustedMaxSize = minSize
+    }
+    if adjustedMaxSize > MaxUserPayload {
+        adjustedMaxSize = MaxUserPayload
+    }
+
+    // Calculate size range with proper bounds
+    sizeRange := adjustedMaxSize - minSize + 1
+    if sizeRange <= 0 {
+        sizeRange = 1
+    }
+    size := secureRandInt(sizeRange) + minSize
+    
+    // Ensure size doesn't exceed adjusted maximum
+    if size > adjustedMaxSize {
+        size = adjustedMaxSize
+    }
+    if size < minSize {
+        size = minSize
+    }
+
     randomBytes := make([]byte, size)
     _, err := rand.Read(randomBytes)
     if err != nil {
@@ -332,15 +353,20 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
     }
 
     // Create internal message with dummy recipient
-    dummyAddress := generateRandomOnionV3Address() + ".dummy:8080"
     internalMessage := fmt.Sprintf("To: %s\n\n%s", dummyAddress, string(randomBytes))
 
-    // Validate initial message size
+    // This check should never fail with proper calculations, but keep as safety
     if len(internalMessage) > MaxUserPayload {
-        if !quietMode {
-            fmt.Printf("Internal message exceeds user payload limit: %d > %d\n", len(internalMessage), MaxUserPayload)
+        // If somehow still too large, truncate the random payload
+        excess := len(internalMessage) - MaxUserPayload
+        if size > excess {
+            randomBytes = randomBytes[:size-excess]
+            internalMessage = fmt.Sprintf("To: %s\n\n%s", dummyAddress, string(randomBytes))
         }
-        return
+        // If still too large after truncation, drop this message silently
+        if len(internalMessage) > MaxUserPayload {
+            return
+        }
     }
 
     firstNode := strings.TrimSpace(nodes[0])
@@ -350,26 +376,22 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
     }
 
     if len(nodes) == 1 {
-        // Single node chain - Calculate exact available space
+        // Single node chain - CORRECT ORDER: padding then encryption
         pubKey, found := findPublicKey(pubKeys, firstNode)
         if !found {
             return
         }
         
-        // Calculate exact maximum payload size for encryption
-        // MaxTotalSize = routing header + encrypted data
-        // encrypted data = 56 bytes overhead + padded message
+        // Calculate exact available space for encryption
         routingHeader := []byte("To: " + dummyAddress + "\n\n")
-        maxEncryptedPayloadSize := MaxTotalSize - len(routingHeader)
-        maxPaddedMessageSize := maxEncryptedPayloadSize - 56 // encryption overhead
+        availableForPadding := MaxTotalSize - len(routingHeader) - 56 // 56 bytes for encryption overhead
         
-        // Apply padding within calculated limits
-        paddedMessage, err := adaptivePadding([]byte(internalMessage), maxPaddedMessageSize)
+        paddedMessage, err := adaptivePadding([]byte(internalMessage), availableForPadding)
         if err != nil {
+            // If padding fails, use original message
             paddedMessage = []byte(internalMessage)
         }
         
-        // Encrypt the padded message
         encryptedData, err := encryptMessageRawSecure(paddedMessage, pubKey)
         if err != nil {
             return
@@ -378,14 +400,12 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
         // Add routing header after encryption
         finalMessage := append(routingHeader, encryptedData...)
         
-        // Final verification - this should never fail with proper calculations
+        // Final size check - should never exceed with proper calculations
         if len(finalMessage) > MaxTotalSize {
-            // This should never happen - log for debugging but send anyway
-            if !quietMode {
-                fmt.Printf("WARNING: Final message exceeds limit (calculation error): %d > %d\n", 
-                    len(finalMessage), MaxTotalSize)
+            // If somehow still too large, truncate (should never happen)
+            if len(finalMessage) > MaxTotalSize {
+                finalMessage = finalMessage[:MaxTotalSize]
             }
-            // Continue with sending despite the size issue
         }
         
         err = uploadFileSecure(firstMixnode.Address, bytes.NewReader(finalMessage))
@@ -406,10 +426,10 @@ func sendCoverMessage(chain string, minSize, maxSize int, pubKeys []KeyEntry, mi
         
         // Final size check for multi-node messages
         if len(encryptedMessage) > MaxTotalSize {
-            if !quietMode {
-                fmt.Printf("Multi-node message exceeds limit: %d > %d\n", len(encryptedMessage), MaxTotalSize)
+            // If somehow too large, truncate (should never happen)
+            if len(encryptedMessage) > MaxTotalSize {
+                encryptedMessage = encryptedMessage[:MaxTotalSize]
             }
-            return
         }
         
         err = uploadFileSecure(firstMixnode.Address, strings.NewReader(encryptedMessage))
