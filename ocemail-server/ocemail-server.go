@@ -140,7 +140,6 @@ func isAllowed(recipient string) bool {
 }
 
 func generateMessageID() string {
-	// Zufälliger Teil
 	randomBytes := make([]byte, 8)
 	rand.Read(randomBytes)
 	randomPart := fmt.Sprintf("%x", randomBytes)
@@ -209,7 +208,8 @@ func modifyHeaders(original []byte) []byte {
 
 				if headersEnded {
 					buffer.WriteString(crlf)
-					headersEnded = false
+					headersProcessed = true
+					continue
 				}
 			}
 		}
