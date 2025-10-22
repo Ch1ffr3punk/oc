@@ -210,7 +210,7 @@ wau OK
 If you are a respected member of a privacy community and would  
 like your public mix node been listed, just mail me the public key  
 and mix node address along with the nickname of your mix node to:  
-stefanclaasATtutanotaDOTde    
+stefanDOTclaasATmailDOTru    
 
 ## Start endpoint server
 $ ./ochome-server -p inbox
@@ -352,6 +352,7 @@ XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk9
 Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk)     
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
