@@ -1,0 +1,30 @@
+Whitelist examples (whitelist.txt):
+
+# Comment
+example.com
+gmail.com
+protonmail.com
+tutanota.com
+
+admin@mycompany.org
+support@important-service.net
+john.doe@partner-firma.de
+
+
+# Blacklist examples (blacklist.txt)
+
+spamhaus.org
+malicious-domain.com
+fake-news.net
+
+bad-actor@evil.com
+spammer@annoying.net
+phishing@fake-bank.org
+
+Usage: 
+./email-server -w whitelist.txt
+
+./email-server -b blacklist.txt
+
+Without access control (Open Relay!)
+./email-server
