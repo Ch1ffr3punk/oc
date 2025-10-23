@@ -1,0 +1,31 @@
+Example email message:
+----------------------
+
+To: zrfezqe7i47fsxes5ingarvpz4dgaq3ttszkos7kfzm5liwpdpq322qd.onion:8088
+
+To: Bob <bob@example.org>
+Subject: Hello Bob
+
+Hi,
+
+have a nice day.
+
+Regards
+Alice
+
+MIME headers, Message-ID and Date Header will be automatically added.
+
+Example Usenet message:
+-----------------------
+
+To: ugf7olo27n5nq2jr6yoai2j5jo24ogx6yemjaozsgxg3byfpcpwdg7id.onion:8088
+
+From: Bob <bob@eaxample.org>
+Subject: Test
+Newsgroups: alt.test.test
+
+This is a test.
+
+You have to add MIME headers by yourself. If you omit the From: header
+one will be automatically set by dizum.
+
