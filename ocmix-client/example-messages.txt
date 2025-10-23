@@ -14,6 +14,7 @@ Regards
 Alice
 
 MIME headers, Message-ID and Date Header will be automatically added.
+A fixed From: header too, which is: Onion Courier <noreply@oc2mx.net>
 
 Example Usenet message:
 -----------------------
@@ -28,4 +29,5 @@ This is a test.
 
 You have to add MIME headers by yourself. If you omit the From: header
 one will be automatically set by dizum.
+
 
