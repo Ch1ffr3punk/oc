@@ -109,14 +109,43 @@ func adaptivePadding(message []byte, maxTotalSize int) ([]byte, error) {
 }
 
 func main() {
-	rateMinStr := flag.String("rate-min", "", "Minimum messages per hour (optional)")
-	rateMaxStr := flag.String("rate-max", "", "Maximum messages per hour (optional)")
+	rateMinStr := flag.String("rate-min", "", "Minimum messages per hour (required)")
+	rateMaxStr := flag.String("rate-max", "", "Maximum messages per hour (required, max 180)")
 	minSize := flag.Int("min", 32, "Minimum message size")
 	maxSize := flag.Int("max", 20480, "Maximum message size")
 	chain := flag.String("chain", "", "Comma-separated node chain (optional)")
 	flag.BoolVar(&quietMode, "q", false, "Quiet mode - no output at all")
 
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [options]\n\n", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "Cover Traffic Generator for Onion Courier\n\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "Required options:\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  -rate-min int    Minimum messages per hour\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  -rate-max int    Maximum messages per hour (max 180)\n\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "Optional options:\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  -min int         Minimum message size (default 32)\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  -max int         Maximum message size (default 20480)\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  -chain string    Comma-separated node chain (optional)\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  -q               Quiet mode - no output at all\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "Example:\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  %s -rate-min 5 -rate-max 15 -min 100 -max 1000\n", os.Args[0])
+	}
+
 	flag.Parse()
+
+	// Show usage if no arguments provided
+	if len(os.Args) == 1 {
+		flag.Usage()
+		os.Exit(0)
+	}
+
+	// Validate required parameters
+	if *rateMinStr == "" || *rateMaxStr == "" {
+		fmt.Fprintf(os.Stderr, "Error: -rate-min and -rate-max are required parameters\n\n")
+		flag.Usage()
+		os.Exit(1)
+	}
 
 	// Set defaults
 	minRate := 0
@@ -138,6 +167,20 @@ func main() {
 		} else {
 			log.Fatalf("Invalid value for rate-max: %s", *rateMaxStr)
 		}
+	}
+
+	// Validate rate limits
+	if minRate < 0 {
+		log.Fatalf("rate-min cannot be negative: %d", minRate)
+	}
+	if maxRate < 0 {
+		log.Fatalf("rate-max cannot be negative: %d", maxRate)
+	}
+	if maxRate > 180 {
+		log.Fatalf("rate-max cannot exceed 180: %d", maxRate)
+	}
+	if minRate > maxRate {
+		log.Fatalf("rate-min (%d) cannot be greater than rate-max (%d)", minRate, maxRate)
 	}
 
 	if !quietMode {
