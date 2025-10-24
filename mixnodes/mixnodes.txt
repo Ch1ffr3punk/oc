@@ -5,6 +5,9 @@ bob
 hal
 rayvmrv645fln4cmkglfdio4pjwebqotqib7ajpx4mbobbpkdkwgfzad.onion:8080
 
+kdb
+6dfu4bp7psuw4z35brxugaeay7paoyugrmqnxe4lrllj7ty5ebqpfjqd.onion:8080
+
 len
 kruezafj3q6p7z5x4c7mjdvxz225mfprto7k4bymdkxv5qzzsamywdyd.onion:8080
 
