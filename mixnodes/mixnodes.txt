@@ -11,6 +11,9 @@ kdb
 len
 kruezafj3q6p7z5x4c7mjdvxz225mfprto7k4bymdkxv5qzzsamywdyd.onion:8080
 
+sid
+twtytlggfkt5qmvhme3jsshiceswr36v74lsmkgrn3zspraxcgzii7ad.onion:8080
+
 ulf
 5s6chpom2x77gl5pehdea3jrone46r5vqs5p4u2rhhneutzsp4fvzsqd.onion:8080
 
