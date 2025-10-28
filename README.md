@@ -173,8 +173,7 @@ Bob
 or  
 
 To: ugf7olo27n5nq2jr6yoai2j5jo24ogx6yemjaozsgxg3byfpcpwdg7id.onion:8088  
-
-From: Onion Courier <noreply\@oc2mx.net>  
+ 
 Subject: Test  
 Newsgroups: alt.test.test  
 
@@ -352,6 +351,7 @@ XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk9
 Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk)     
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
