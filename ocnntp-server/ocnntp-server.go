@@ -34,7 +34,7 @@ func normalizeLineEndings(data []byte) []byte {
 }
 
 func generateMessageID() string {
-	randomBytes := make([]byte, 10)
+	randomBytes := make([]byte, 11)
 	rand.Read(randomBytes)
 	randomPart := hex.EncodeToString(randomBytes)
 	return fmt.Sprintf("<%s@oc2mxnet>", randomPart)
