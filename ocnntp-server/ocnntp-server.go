@@ -34,10 +34,10 @@ func normalizeLineEndings(data []byte) []byte {
 }
 
 func generateMessageID() string {
-	randomBytes := make([]byte, 11)
+	randomBytes := make([]byte, 10)
 	rand.Read(randomBytes)
 	randomPart := hex.EncodeToString(randomBytes)
-	return fmt.Sprintf("<%s@oc2mxnet>", randomPart)
+	return fmt.Sprintf("<%s@oc2mx.net>", randomPart)
 }
 
 func handleUpload(w http.ResponseWriter, r *http.Request) {
