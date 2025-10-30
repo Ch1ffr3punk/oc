@@ -1,4 +1,4 @@
-module ocnntp-server
+module ocnntp
 
 go 1.25.0
 
