@@ -140,11 +140,17 @@ func isAllowed(recipient string) bool {
 }
 
 func generateMessageID() string {
-	randomBytes := make([]byte, 8)
-	rand.Read(randomBytes)
-	randomPart := fmt.Sprintf("%x", randomBytes)
-
-	return fmt.Sprintf("<%s.%s@%s>", time.Now().Format("20060102.150405"), randomPart, messageIDDomain)
+    const chars = "0123456789abcdefghijklmnopqrstuvwxyz"
+    randomBytes := make([]byte, 21)
+    rand.Read(randomBytes)
+    
+    var randomPart strings.Builder
+    randomPart.Grow(21)
+    for _, b := range randomBytes {
+        randomPart.WriteByte(chars[b % byte(len(chars))])
+    }
+    
+    return fmt.Sprintf("<%s@oc2mx.net>", randomPart.String())
 }
 
 func formatUTCDate() string {
