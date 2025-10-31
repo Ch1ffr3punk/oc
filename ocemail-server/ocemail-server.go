@@ -158,80 +158,115 @@ func formatUTCDate() string {
 }
 
 func modifyHeaders(original []byte) []byte {
-	var buffer bytes.Buffer
-	scanner := bufio.NewScanner(bytes.NewReader(original))
+    var buffer bytes.Buffer
+    scanner := bufio.NewScanner(bytes.NewReader(original))
 
-	headersProcessed := false
-	headersEnded := false
-	hasMimeVersion := false
-	hasContentType := false
-	hasContentTransferEncoding := false
+    hasMimeVersion := false
+    hasContentType := false
+    hasContentTransferEncoding := false
+    hasSubject := false
+    hasReferences := false
+    
+    var subjectHeader strings.Builder
+    var referencesHeader strings.Builder
+    var otherHeaders bytes.Buffer
 
-	for scanner.Scan() {
-		line := scanner.Text()
+    buffer.WriteString("From: " + fixedFrom + crlf)
+    buffer.WriteString("Comment: This message did not originate from the sender address above." + crlf)
+    buffer.WriteString("Comment: It was mailed anonymously through the Onion Courier Mixnet." + crlf)
+    buffer.WriteString("Contact: info@oc2mx.net" + crlf)
 
-		if !headersProcessed {
-			lowerLine := strings.ToLower(line)
-			if strings.HasPrefix(lowerLine, "mime-version:") {
-				hasMimeVersion = true
-			}
-			if strings.HasPrefix(lowerLine, "content-type:") {
-				hasContentType = true
-			}
-			if strings.HasPrefix(lowerLine, "content-transfer-encoding:") {
-				hasContentTransferEncoding = true
-			}
+    inSubject := false
+    inReferences := false
 
-			if line == "" {
-				headersEnded = true
-			}
+    for scanner.Scan() {
+        line := scanner.Text()
+        
+        if line == "" {
+            break
+        }
 
-			if headersEnded || strings.HasPrefix(lowerLine, "from:") {
-				if !headersProcessed {
-					buffer.WriteString("From: " + fixedFrom + crlf)
-					buffer.WriteString("Comment: This message did not originate from the sender address above." + crlf)
-					buffer.WriteString("Comment: It was mailed anonymously through the Onion Courier Mixnet." + crlf)
-					buffer.WriteString("Contact: info@oc2mx.net" + crlf)
-					buffer.WriteString("Message-ID: " + generateMessageID() + crlf)
-					buffer.WriteString("Date: " + formatUTCDate() + crlf)
+        isFolded := len(line) > 0 && (line[0] == ' ' || line[0] == '\t')
+        
+        if isFolded {
+            if inSubject {
+                subjectHeader.WriteString(crlf + line)
+                continue
+            } else if inReferences {
+                referencesHeader.WriteString(crlf + line)
+                continue
+            }
+            otherHeaders.WriteString(crlf + line)
+            continue
+        }
 
-					if !hasMimeVersion {
-						buffer.WriteString("MIME-Version: 1.0" + crlf)
-					}
-					if !hasContentType {
-						buffer.WriteString("Content-Type: text/plain; charset=UTF-8" + crlf)
-					}
-					if !hasContentTransferEncoding {
-						buffer.WriteString("Content-Transfer-Encoding: 8bit" + crlf)
-					}
+        inSubject = false
+        inReferences = false
+        
+        lowerLine := strings.ToLower(line)
+        
+        if strings.HasPrefix(lowerLine, "subject:") {
+            inSubject = true
+            hasSubject = true
+            subjectHeader.WriteString(line)
+            continue
+        }
+        
+        if strings.HasPrefix(lowerLine, "references:") {
+            inReferences = true
+            hasReferences = true
+            referencesHeader.WriteString(line)
+            continue
+        }
 
-					headersProcessed = true
+        if strings.HasPrefix(lowerLine, "from:") || 
+           strings.HasPrefix(lowerLine, "message-id:") || 
+           strings.HasPrefix(lowerLine, "date:") {
+            continue
+        }
 
-					if strings.HasPrefix(lowerLine, "from:") {
-						continue
-					}
-				}
+        otherHeaders.WriteString(line + crlf)
 
-				if headersEnded {
-					buffer.WriteString(crlf)
-					headersProcessed = true
-					continue
-				}
-			}
-		}
+        if strings.HasPrefix(lowerLine, "mime-version:") {
+            hasMimeVersion = true
+        }
+        if strings.HasPrefix(lowerLine, "content-type:") {
+            hasContentType = true
+        }
+        if strings.HasPrefix(lowerLine, "content-transfer-encoding:") {
+            hasContentTransferEncoding = true
+        }
+    }
 
-		lowerLine := strings.ToLower(line)
-		if strings.HasPrefix(lowerLine, "message-id:") || 
-		   strings.HasPrefix(lowerLine, "date:") {
-			continue
-		}
+    if hasSubject {
+        buffer.WriteString(subjectHeader.String() + crlf)
+    }
+    if hasReferences {
+        buffer.WriteString(referencesHeader.String() + crlf)
+    }
 
-		if !(strings.HasPrefix(lowerLine, "from:") && headersProcessed) {
-			buffer.WriteString(line + crlf)
-		}
-	}
+    buffer.WriteString("Message-ID: " + generateMessageID() + crlf)
+    buffer.WriteString("Date: " + formatUTCDate() + crlf)
 
-	return buffer.Bytes()
+    buffer.WriteString(otherHeaders.String())
+
+    if !hasMimeVersion {
+        buffer.WriteString("MIME-Version: 1.0" + crlf)
+    }
+    if !hasContentType {
+        buffer.WriteString("Content-Type: text/plain; charset=UTF-8" + crlf)
+    }
+    if !hasContentTransferEncoding {
+        buffer.WriteString("Content-Transfer-Encoding: 8bit" + crlf)
+    }
+
+    buffer.WriteString(crlf)
+
+    for scanner.Scan() {
+        buffer.WriteString(scanner.Text() + crlf)
+    }
+
+    return buffer.Bytes()
 }
 
 func normalizeLineEndings(data []byte) []byte {
