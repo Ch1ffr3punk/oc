@@ -339,18 +339,16 @@ golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
 
-## --
-If you like the idea of an own privately run Onion Courier Mixnet,    
-as much as I do, consider a small donation.  
-```
-BTC: bc1qhgek8p5qcwz7r6502y8tvenkpsw9w5yafhatxk  
+If you like the idea of your own privately run Onion Courier Mixnet,  
+consider a small donation in crypto currencies or buy me a coffee.  
+```  
+BTC: bc1qhgek8p5qcwz7r6502y8tvenkpsw9w5yafhatxk 
 Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys  
-XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
+XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS
 ```
+<a href="https://www.buymeacoffee.com/Ch1ffr3punk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
-Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk)     
-
-The Onion Courier Mixnet is dedicated to Alice and Bob.  
+Onion Courier is dedicated to Alice and Bob.
 
 
 
