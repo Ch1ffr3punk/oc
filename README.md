@@ -343,7 +343,7 @@ patrickmn/go-cache: In-memory cache for replay protection
 If you like the idea of an own privately run Onion Courier Mixnet,    
 as much as I do, consider a small donation.  
 ```
-BTC: 129yB8kL8mQVZufNS4huajsdJPa48aHwHz  
+BTC: bc1qhgek8p5qcwz7r6502y8tvenkpsw9w5yafhatxk  
 Nym: n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys  
 XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS  
 ```
@@ -351,6 +351,7 @@ XMR: 45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk9
 Or, if you prefer, [buy me a coffee.](https://buymeacoffee.com/ch1ffr3punk)     
 
 The Onion Courier Mixnet is dedicated to Alice and Bob.  
+
 
 
 
