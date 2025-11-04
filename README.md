@@ -346,12 +346,11 @@ consider a small donation in crypto currencies or buy me a coffee.
 - **Nym:** `n1yql04xjhmlhfkjsk8x8g7fynm27xzvnk23wfys`  
 - **Monero (XMR):** `45TJx8ZHngM4GuNfYxRw7R7vRyFgfMVp862JqycMrPmyfTfJAYcQGEzT27wL1z5RG1b5XfRPJk97KeZr1svK8qES2z1uZrS`  
 
-Or if you prefer  
-
 <a href="https://www.buymeacoffee.com/Ch1ffr3punk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
 
 Onion Courier is dedicated to Alice and Bob.
+
 
 
 
