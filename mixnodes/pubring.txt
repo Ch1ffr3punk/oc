@@ -1,4 +1,3 @@
-
 bob
 -----BEGIN PUBLIC KEY-----
 IqnRqwwH/dhFz7un/8vWsWCvjh6Mr3aKroVJruNvyng=
