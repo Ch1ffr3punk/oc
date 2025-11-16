@@ -1035,7 +1035,7 @@ func createGUI() fyne.CanvasObject {
 
 	chainLabel := widget.NewLabel("Chain:")
 	chainEntry = widget.NewEntry()
-	chainEntry.SetPlaceHolder("Enter mix node chain (comma-separated, e.g., node1,node2,node3)")
+	chainEntry.SetPlaceHolder("Enter a chain of up to five comma-separated mix nodes")
 	chainEntry.Wrapping = fyne.TextTruncate
 	chainContainer := container.NewBorder(nil, nil, chainLabel, nil, chainEntry)
 
@@ -1051,7 +1051,7 @@ func createGUI() fyne.CanvasObject {
 		layout.NewSpacer(),
 	)
 
-	statusLabel = widget.NewLabel("Ready to send secure messages...")
+	statusLabel = widget.NewLabel("Ready to send messages...")
 	statusLabel.Wrapping = fyne.TextWrapWord
 	statusScroll = container.NewScroll(statusLabel)
 	statusScroll.SetMinSize(fyne.NewSize(0, 60))
