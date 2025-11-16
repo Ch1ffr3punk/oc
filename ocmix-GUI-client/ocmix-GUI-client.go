@@ -37,7 +37,6 @@ var currentTheme string
 var myApp fyne.App
 var myWindow fyne.Window
 
-// Config holds client configuration paths and URLs
 type Config struct {
 	PubKeysURL   string `json:"pubkeys_url"`
 	MixnodesURL  string `json:"mixnodes_url"`
@@ -46,26 +45,23 @@ type Config struct {
 	MixnodesFile string `json:"mixnodes_file"`
 }
 
-// KeyEntry represents a public key with a name
 type KeyEntry struct {
 	Name string
 	Key  [32]byte
 }
 
-// MixnodeEntry represents a mix node with name and address
 type MixnodeEntry struct {
 	Name    string
 	Address string
 	Status  string
 }
 
-// Constants for message sizing and padding
 const (
 	PaddingHeader  = "-----BEGIN PADDING-----"
 	PaddingFooter  = "-----END PADDING-----"
-	MaxUserPayload = 20480  // 20 KB maximum user message size
-	MinTotalSize   = 1024   // 1 KB minimum total message size after padding
-	MaxTotalSize   = 28672  // 28 KB maximum total message size after padding (server limit)
+	MaxUserPayload = 20480
+	MinTotalSize   = 1024
+	MaxTotalSize   = 28672
 )
 
 func init() {
@@ -73,7 +69,6 @@ func init() {
 	defer memguard.Purge()
 }
 
-// wrapText wraps text at approximately 76 characters for clean display
 func wrapText(text string, maxLineLength int) string {
 	if len(text) <= maxLineLength {
 		return text
@@ -109,16 +104,14 @@ func wrapText(text string, maxLineLength int) string {
 	return strings.TrimSpace(result.String())
 }
 
-// updateStatus updates the status label with wrapped text and auto-scrolls
 func updateStatus(text string) {
 	wrappedText := wrapText(text, 76)
-	statusLabel.SetText(wrappedText)
-	
-	// Auto-scroll to bottom
-	statusScroll.ScrollToBottom()
+	fyne.Do(func() {
+		statusLabel.SetText(wrappedText)
+		statusScroll.ScrollToBottom()
+	})
 }
 
-// appendStatus appends text to the status label with auto-scroll
 func appendStatus(text string) {
 	currentText := statusLabel.Text
 	if currentText != "" {
@@ -127,7 +120,6 @@ func appendStatus(text string) {
 	updateStatus(currentText + text)
 }
 
-// randInt generates a cryptographically secure random integer between 0 and max-1
 func randInt(max int) int {
 	if max <= 0 {
 		return 0
@@ -139,7 +131,6 @@ func randInt(max int) int {
 	return int(n.Int64())
 }
 
-// max returns the larger of two integers
 func max(a, b int) int {
 	if a > b {
 		return a
@@ -147,7 +138,6 @@ func max(a, b int) int {
 	return b
 }
 
-// min returns the smaller of two integers
 func min(a, b int) int {
 	if a < b {
 		return a
@@ -155,7 +145,6 @@ func min(a, b int) int {
 	return b
 }
 
-// adaptivePadding applies padding that automatically adapts to available space
 func adaptivePadding(message []byte, maxTotalSize int) ([]byte, error) {
 	messageSize := len(message)
 	
@@ -191,7 +180,6 @@ func adaptivePadding(message []byte, maxTotalSize int) ([]byte, error) {
 	return []byte(padded), nil
 }
 
-// extractRecipient extracts the recipient from the message
 func extractRecipient(message []byte) string {
 	lines := strings.SplitN(string(message), "\n", 2)
 	if len(lines) > 0 && strings.HasPrefix(lines[0], "To:") {
@@ -200,7 +188,6 @@ func extractRecipient(message []byte) string {
 	return ""
 }
 
-// pingMixnodes checks the status of all mixnodes in real-time in alphabetical order
 func pingMixnodes() {
 	config, err := ensureConfig()
 	if err != nil {
@@ -222,10 +209,8 @@ func pingMixnodes() {
 	
 	resultMap := make(map[string]string)
 	resultMutex := &sync.Mutex{}
-	
 	resultReady := make(chan string, len(mixnodes))
 	
-	// Check each node in parallel
 	for i := range mixnodes {
 		go func(index int, name string) {
 			status := checkNodeStatus(mixnodes[index].Address)
@@ -254,14 +239,17 @@ func pingMixnodes() {
 		}
 		resultMutex.Unlock()
 		
-		statusLabel.SetText(strings.TrimSpace(currentOutput.String()))
-		statusScroll.ScrollToBottom()
+		fyne.Do(func() {
+			statusLabel.SetText(strings.TrimSpace(currentOutput.String()))
+			statusScroll.ScrollToBottom()
+		})
 		
 		time.Sleep(100 * time.Millisecond)
 	}
 	
 	var finalOutput strings.Builder
 	finalOutput.WriteString("Checking mix node status via Tor...\n\n")
+
 	resultMutex.Lock()
 	for _, node := range mixnodes {
 		finalOutput.WriteString(fmt.Sprintf("%s\t\t\t%s\n", node.Name, resultMap[node.Name]))
@@ -272,7 +260,6 @@ func pingMixnodes() {
 	updateStatus(finalOutput.String())
 }
 
-// checkNodeStatus checks if mixnode is online
 func checkNodeStatus(address string) string {
     if !strings.HasPrefix(address, "http://") && !strings.HasPrefix(address, "https://") {
         address = "http://" + address
@@ -329,7 +316,6 @@ func checkNodeStatus(address string) string {
     return "n/a"
 }
 
-// loadConfig loads or creates default config
 func loadConfig() (*Config, error) {
 	configDir := filepath.Join(".", "oc")
 	configFile := filepath.Join(configDir, "config.json")
@@ -388,7 +374,6 @@ func ensureConfig() (*Config, error) {
 	return config, nil
 }
 
-// downloadConfigurations fetches keys and mixnodes via Tor
 func downloadConfigurations() string {
 	config, err := loadConfig()
 	if err != nil {
@@ -452,14 +437,12 @@ func downloadFileViaTor(url, filename string) error {
 	return os.WriteFile(filename, data, 0600)
 }
 
-// encryptAndUploadRandom selects 2-5 random mix nodes and sends the message
 func encryptAndUploadRandom() string {
 	plaintext := textArea.Text
 	if len(plaintext) == 0 {
 		return "Error: No message text provided"
 	}
 
-	// Secure memory handling
 	plaintextBuf := memguard.NewBufferFromBytes([]byte(plaintext))
 	defer plaintextBuf.Destroy()
 
@@ -473,7 +456,7 @@ func encryptAndUploadRandom() string {
 		return fmt.Sprintf("Error loading mix node addresses: %v", err)
 	}
 
-	numHops := 2 + randInt(4) // 2 to 5 hops
+	numHops := 2 + randInt(4)
 
 	if len(mixnodes) < numHops {
 		return fmt.Sprintf("Not enough mix nodes available. Need %d, have %d", numHops, len(mixnodes))
@@ -488,7 +471,6 @@ func encryptAndUploadRandom() string {
 	return encryptAndUpload(nodeNames, plaintextBuf.Bytes(), config)
 }
 
-// sendDummyTraffic sends a single cover message
 func sendDummyTraffic() string {
     config, err := loadConfig()
     if err != nil {
@@ -504,16 +486,14 @@ func sendDummyTraffic() string {
         return "No mix nodes available for cover traffic"
     }
 
-    _ = "Sending message..."
     err = sendSingleDummyMessage(config, mixnodes, 1)
     if err != nil {
-        return fmt.Sprintf("Error sending message: %v", err)
+        return fmt.Sprintf("Error sending cover message: %v", err)
     }
     
-    return "Message sent successfully!"
+    return "Cover message sent successfully!"
 }
 
-// sendSingleDummyMessage sends one dummy message through a random chain
 func sendSingleDummyMessage(config *Config, mixnodes []MixnodeEntry, messageCount int) error {
 	chainLength := 1 + randInt(5)
 	if len(mixnodes) < chainLength {
@@ -559,7 +539,6 @@ func sendSingleDummyMessage(config *Config, mixnodes []MixnodeEntry, messageCoun
 	return uploadFile(firstNode.Address, strings.NewReader(dummyMessage))
 }
 
-// createDummyMessage builds an encrypted dummy message for cover traffic
 func createDummyMessage(nodeNames []string, payload string, mixnodes []MixnodeEntry, config *Config) (string, error) {
 	pubKeys, err := loadPublicKeys(config.PubKeysFile)
 	if err != nil {
@@ -618,7 +597,6 @@ func createDummyMessage(nodeNames []string, payload string, mixnodes []MixnodeEn
 	return string(currentMessage), nil
 }
 
-// encryptAndUploadManual handles user-specified node chain
 func encryptAndUploadManual() string {
 	namesArg := chainEntry.Text
 	plaintext := textArea.Text
@@ -630,7 +608,6 @@ func encryptAndUploadManual() string {
 		return "Error: No node chain provided"
 	}
 
-	// Secure memory handling
 	plaintextBuf := memguard.NewBufferFromBytes([]byte(plaintext))
 	defer plaintextBuf.Destroy()
 
@@ -651,7 +628,6 @@ func encryptAndUploadManual() string {
 	return encryptAndUpload(names, plaintextBuf.Bytes(), config)
 }
 
-// selectRandomNodes picks 'count' random mix nodes
 func selectRandomNodes(mixnodes []MixnodeEntry, count int) []MixnodeEntry {
 	nodes := make([]MixnodeEntry, len(mixnodes))
 	copy(nodes, mixnodes)
@@ -663,7 +639,6 @@ func selectRandomNodes(mixnodes []MixnodeEntry, count int) []MixnodeEntry {
 	return nodes[:count]
 }
 
-// encryptMessageRaw encrypts using NaCl Box with raw binary output
 func encryptMessageRaw(plaintext []byte, serverPubKey [32]byte) ([]byte, error) {
     ephemeralPublic, ephemeralPrivate, err := box.GenerateKey(rand.Reader)
     if err != nil {
@@ -685,7 +660,6 @@ func encryptMessageRaw(plaintext []byte, serverPubKey [32]byte) ([]byte, error) 
     return output, nil
 }
 
-// findMixnode looks up a mix node by name
 func findMixnode(mixnodes []MixnodeEntry, name string) (MixnodeEntry, bool) {
 	cleanName := strings.TrimSpace(name)
 	for _, m := range mixnodes {
@@ -696,7 +670,6 @@ func findMixnode(mixnodes []MixnodeEntry, name string) (MixnodeEntry, bool) {
 	return MixnodeEntry{}, false
 }
 
-// formatDuration returns human-readable duration
 func formatDuration(d time.Duration) string {
 	d = d.Round(time.Second)
 	m := d / time.Minute
@@ -707,7 +680,6 @@ func formatDuration(d time.Duration) string {
 	return fmt.Sprintf("%d sec", s)
 }
 
-// hasDuplicates checks for duplicate node names
 func hasDuplicates(names []string) bool {
 	seen := make(map[string]bool)
 	for _, name := range names {
@@ -720,7 +692,6 @@ func hasDuplicates(names []string) bool {
 	return false
 }
 
-// loadPublicKeys parses PEM-formatted public keys
 func loadPublicKeys(filename string) ([]KeyEntry, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
@@ -757,7 +728,6 @@ func loadPublicKeys(filename string) ([]KeyEntry, error) {
 	return keys, nil
 }
 
-// loadMixnodeAddresses loads name/address pairs
 func loadMixnodeAddresses(filename string) ([]MixnodeEntry, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
@@ -790,7 +760,6 @@ func loadMixnodeAddresses(filename string) ([]MixnodeEntry, error) {
 	return mixnodes, nil
 }
 
-// findPublicKey looks up a key by name
 func findPublicKey(keys []KeyEntry, name string) ([32]byte, bool) {
 	cleanName := strings.TrimSpace(name)
 	for _, k := range keys {
@@ -850,7 +819,6 @@ func uploadFile(serverAddress string, data io.Reader) error {
     return nil
 }
 
-// encryptAndUpload builds the encrypted onion message and sends it through the mixnet
 func encryptAndUpload(names []string, plaintext []byte, config *Config) string {
     startTime = time.Now()
 
@@ -889,7 +857,7 @@ func encryptAndUpload(names []string, plaintext []byte, config *Config) string {
         currentNodeName := strings.TrimSpace(names[i])
         pubKey, found := findPublicKey(pubKeys, currentNodeName)
         if !found {
-            return fmt.Sprintf("ERROR: Public key not found for: %s", currentNodeName)
+            return fmt.Sprintf("FATAL: Public key not found for: %s", currentNodeName)
         }
 
         var nextHop string
@@ -902,7 +870,7 @@ func encryptAndUpload(names []string, plaintext []byte, config *Config) string {
             nextNodeName := strings.TrimSpace(names[i+1])
             nextMixnode, found := findMixnode(mixnodes, nextNodeName)
             if !found {
-                return fmt.Sprintf("ERROR: Next mix node not found: %s", nextNodeName)
+                return fmt.Sprintf("FATAL: Next mix node not found: %s", nextNodeName)
             }
             nextHop = nextMixnode.Address
             routingHeader = []byte("To: " + nextHop + "\n\n")
@@ -955,7 +923,6 @@ func encryptAndUpload(names []string, plaintext []byte, config *Config) string {
     return fmt.Sprintf("Message sent successfully. Time: %s", formatDuration(elapsed))
 }
 
-// generateRandomPayload creates a random alphanumeric payload
 func generateRandomPayload(size int) []byte {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	result := make([]byte, size)
@@ -973,32 +940,32 @@ func generateRandomPayload(size int) []byte {
 	return result
 }
 
-// secureClear securely clears the text area and chain entry
 func secureClear() {
-	// Secure clearing of text area
 	if textArea.Text != "" {
-		// Create secure buffer and overwrite
 		textBuf := memguard.NewBufferFromBytes([]byte(textArea.Text))
 		defer textBuf.Destroy()
-		textBuf.Melt() // Make mutable
-		textBuf.Wipe() // Securely wipe
-		textArea.SetText("")
+		textBuf.Melt()
+		textBuf.Wipe()
+		
+		fyne.Do(func() {
+			textArea.SetText("")
+		})
 	}
 
-	// Secure clearing of chain entry
 	if chainEntry.Text != "" {
-		// Create secure buffer and overwrite
 		chainBuf := memguard.NewBufferFromBytes([]byte(chainEntry.Text))
 		defer chainBuf.Destroy()
-		chainBuf.Melt() // Make mutable
-		chainBuf.Wipe() // Securely wipe
-		chainEntry.SetText("")
+		chainBuf.Melt()
+		chainBuf.Wipe()
+		
+		fyne.Do(func() {
+			chainEntry.SetText("")
+		})
 	}
 
 	updateStatus("Text fields securely cleared. All sensitive data wiped from memory.")
 }
 
-// GUI Functions
 func toggleTheme() {
 	if currentTheme == "dark" {
 		myApp.Settings().SetTheme(theme.LightTheme())
@@ -1044,11 +1011,9 @@ func sendCover() {
 }
 
 func createGUI() fyne.CanvasObject {
-	// Theme toggle with circle icon (using ViewRefreshIcon as requested)
 	themeButton := widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), toggleTheme)
 	themeButton.Importance = widget.LowImportance
 
-	// Top buttons
 	infoButton := widget.NewButton("Info", showInfo)
 	pingButton := widget.NewButton("Ping", showPing)
 	coverButton := widget.NewButton("Cover", sendCover)
@@ -1062,22 +1027,18 @@ func createGUI() fyne.CanvasObject {
 		themeButton,
 	)
 
-	// Text area with mono font
 	textArea = widget.NewMultiLineEntry()
 	textArea.SetPlaceHolder("Enter your message here...")
 	textArea.Wrapping = fyne.TextWrapWord
 	textArea.SetMinRowsVisible(15)
 	textArea.TextStyle = fyne.TextStyle{Monospace: true}
 
-	// Chain input
 	chainLabel := widget.NewLabel("Chain:")
 	chainEntry = widget.NewEntry()
-	chainEntry.SetPlaceHolder("Enter a chain of up to five comma-separated mix nodes")
+	chainEntry.SetPlaceHolder("Enter mix node chain (comma-separated, e.g., node1,node2,node3)")
 	chainEntry.Wrapping = fyne.TextTruncate
-	// Chain Container der die volle Breite nutzt
 	chainContainer := container.NewBorder(nil, nil, chainLabel, nil, chainEntry)
 
-	// Bottom buttons
 	randomButton := widget.NewButton("Random", sendRandom)
 	sendButton := widget.NewButton("Send", sendManual)
 	clearButton := widget.NewButton("Clear", secureClear)
@@ -1090,23 +1051,21 @@ func createGUI() fyne.CanvasObject {
 		layout.NewSpacer(),
 	)
 
-	// Scrollable status label with auto-scroll
-	statusLabel = widget.NewLabel("Ready to send messages...")
+	statusLabel = widget.NewLabel("Ready to send secure messages...")
 	statusLabel.Wrapping = fyne.TextWrapWord
 	statusScroll = container.NewScroll(statusLabel)
 	statusScroll.SetMinSize(fyne.NewSize(0, 60))
 
-	// Layout
 	content := container.NewBorder(
-		topButtons, // top
+		topButtons,
 		container.NewVBox(
 			chainContainer,
 			bottomButtons,
 			statusScroll,
-		), // bottom
-		nil, // left
-		nil, // right
-		textArea, // center
+		),
+		nil,
+		nil,
+		textArea,
 	)
 
 	return content
@@ -1116,10 +1075,9 @@ func main() {
 	startTime = time.Now()
 	
 	myApp = app.NewWithID("ocmix.client")
-	myWindow = myApp.NewWindow("Onion Courier Mixnet Client")
+	myWindow = myApp.NewWindow("Onion Courie Mixnet Client")
 	myWindow.Resize(fyne.NewSize(800, 600))
 
-	// Set initial theme
 	currentTheme = "dark"
 	myApp.Settings().SetTheme(theme.DarkTheme())
 
