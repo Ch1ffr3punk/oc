@@ -1067,6 +1067,7 @@ func createGUI() fyne.CanvasObject {
 	textArea.SetPlaceHolder("Enter your message here...")
 	textArea.Wrapping = fyne.TextWrapWord
 	textArea.SetMinRowsVisible(15)
+	textArea.TextStyle = fyne.TextStyle{Monospace: true}
 
 	// Chain input
 	chainLabel := widget.NewLabel("Chain:")
