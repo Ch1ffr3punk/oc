@@ -1,6 +1,9 @@
 bob
 5eery7vpawbafpllddnjgrxcubpef7a3ccdenoivf3yng4prdnnlw5ad.onion:8080
 
+hal
+y3hekbnmvxfqya3cynwdnpnv7gbaubb2mmhhztdl3dp75dcyahumaoyd.onion:8080
+
 kdb
 6dfu4bp7psuw4z35brxugaeay7paoyugrmqnxe4lrllj7ty5ebqpfjqd.onion:8080
 
@@ -18,4 +21,5 @@ ulf
 
 wau
 ogoxiclsat3lzupmdgxo7ctmfmuikep2sspuym57qngm3bxs4n6koeyd.onion:8080
+
 
