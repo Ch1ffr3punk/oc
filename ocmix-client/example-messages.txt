@@ -15,13 +15,3 @@ Alice
 
 MIME headers, Message-ID and Date Header will be automatically added.
 A fixed From: header too, which is: Onion Courier <noreply@oc2mx.net>
-
-Example Usenet message:
------------------------
-
-To: ugf7olo27n5nq2jr6yoai2j5jo24ogx6yemjaozsgxg3byfpcpwdg7id.onion:8088
-
-Subject: Test
-Newsgroups: alt.test.test
-
-This is a test.
