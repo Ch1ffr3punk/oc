@@ -3,6 +3,11 @@ bob
 IqnRqwwH/dhFz7un/8vWsWCvjh6Mr3aKroVJruNvyng=
 -----END PUBLIC KEY-----
 
+hal
+-----BEGIN PUBLIC KEY-----
+bmhQcNSrRkXoV3D6ZEqKC9+y4/egMi69UAzh3aV8NlE=
+-----END PUBLIC KEY-----
+
 kdb
 -----BEGIN PUBLIC KEY-----
 vemPY5uPFnKMrk+AA1I0I6G2RtoKhbWuVN2/Qd+qmF4=
@@ -32,4 +37,5 @@ wau
 -----BEGIN PUBLIC KEY-----
 2WvHsGEH4xLOAsz68gr0ijiztUEXfJ0W/tIj/JtV+yg=
 -----END PUBLIC KEY-----
+
 
