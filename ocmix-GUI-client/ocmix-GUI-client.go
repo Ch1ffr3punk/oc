@@ -1075,7 +1075,7 @@ func main() {
 	startTime = time.Now()
 	
 	myApp = app.NewWithID("ocmix.client")
-	myWindow = myApp.NewWindow("Onion Courie Mixnet Client")
+	myWindow = myApp.NewWindow("Onion Courier Mixnet Client")
 	myWindow.Resize(fyne.NewSize(800, 600))
 
 	currentTheme = "dark"
