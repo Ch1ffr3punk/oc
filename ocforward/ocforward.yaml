@@ -1,0 +1,17 @@
+# OnionForwarder Configuration with Retry
+users:
+  alice:
+    onion_address: "email123.onion"
+
+  bob:
+    onion_address: "email456.onion"
+
+  stefan:
+    onion_address: "yeffqiea4xtcu6woyab6z6bz4oehisfuzgtmk4e277bydq25p7nha7ad.onion"
+
+# Retry configuration (optional - defaults shown)
+max_retries: 3           # Maximum retry attempts (0 = no retry)
+initial_delay: 1         # Initial delay in seconds
+max_delay: 30            # Maximum delay in seconds
+backoff_factor: 2.0      # Exponential backoff factor
+jitter: true             # Add random jitter to avoid thundering herd
