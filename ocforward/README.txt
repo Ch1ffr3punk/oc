@@ -54,7 +54,6 @@ sudo -u username chmod 644 ~/.forward
 Configuration File
 The config file (/etc/ocforward/ocforward.yaml) supports:
 
-yaml
 # Optional retry configuration (defaults shown)
 max_retries: 3
 initial_delay: 1      # seconds
