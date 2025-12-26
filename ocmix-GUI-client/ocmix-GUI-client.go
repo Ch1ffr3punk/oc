@@ -26,6 +26,7 @@ import (
 	"golang.org/x/crypto/nacl/box"
 	"golang.org/x/net/proxy"
 	"github.com/awnumar/memguard"
+	"mime"
 )
 
 var startTime time.Time
@@ -67,6 +68,92 @@ const (
 func init() {
 	memguard.CatchInterrupt()
 	defer memguard.Purge()
+}
+
+func encodeMIMESubject(input string) string {
+	if input == "" {
+		return ""
+	}
+	
+	encoded := mime.BEncoding.Encode("UTF-8", input)
+	
+	parts := strings.Split(encoded, "?=")
+	if len(parts) <= 1 {
+		return encoded
+	}
+	
+	var result string
+	for i, part := range parts[:len(parts)-1] {
+		if i > 0 {
+			result += ""
+		}
+		result += part + "?=\n"
+	}
+	result += parts[len(parts)-1]
+	
+	return strings.TrimSuffix(result, "\n")
+}
+
+func showSubjectDialog() {
+	subjectEntry := widget.NewEntry()
+	subjectEntry.PlaceHolder = "Enter subject here..."
+	
+	var subjectDialog *widget.PopUp
+	
+	subjectDialog = widget.NewModalPopUp(
+		container.NewVBox(
+			widget.NewLabel("Message Subject"),
+			widget.NewSeparator(),
+			subjectEntry,
+			container.NewHBox(
+				layout.NewSpacer(),
+				widget.NewButton("Cancel", func() {
+					subjectDialog.Hide()
+				}),
+				widget.NewButton("Encode", func() {
+					if subjectEntry.Text != "" {
+						encodedSubject := encodeMIMESubject(subjectEntry.Text) + "\n"
+						currentText := textArea.Text
+						cursorPos := textArea.CursorColumn
+						row := textArea.CursorRow
+						
+						lines := strings.Split(currentText, "\n")
+						actualPos := 0
+						
+						for i := 0; i < row; i++ {
+							if i < len(lines) {
+								actualPos += len(lines[i]) + 1
+							}
+						}
+						
+						if row < len(lines) {
+							if cursorPos > len(lines[row]) {
+								cursorPos = len(lines[row])
+							}
+							actualPos += cursorPos
+						} else {
+							actualPos = len(currentText)
+						}
+						
+						newText := currentText[:actualPos] + encodedSubject + currentText[actualPos:]
+						textArea.SetText(newText)
+						
+						newCursorPos := actualPos + len(encodedSubject)
+						newLines := strings.Split(newText[:newCursorPos], "\n")
+						textArea.CursorRow = len(newLines) - 1
+						textArea.CursorColumn = len(newLines[len(newLines)-1])
+						
+						updateStatus("MIME subject encoded and inserted")
+					}
+					subjectDialog.Hide()
+				}),
+			),
+		),
+		myWindow.Canvas(),
+	)
+	
+	subjectDialog.Show()
+	subjectDialog.Resize(fyne.NewSize(460, 150))
 }
 
 func wrapText(text string, maxLineLength int) string {
@@ -809,7 +896,7 @@ func uploadFile(serverAddress string, data io.Reader) error {
     if err != nil {
         return err
     }
-   	defer resp.Body.Close()
+	defer resp.Body.Close()
 
     if resp.StatusCode != http.StatusOK {
         body, _ := io.ReadAll(resp.Body)
@@ -963,7 +1050,19 @@ func secureClear() {
 		})
 	}
 
-	updateStatus("Text fields securely cleared. All sensitive data wiped from memory.")
+	if myWindow.Clipboard() != nil {
+		clipboardContent := myWindow.Clipboard().Content()
+		if clipboardContent != "" {
+			clipBuf := memguard.NewBufferFromBytes([]byte(clipboardContent))
+			defer clipBuf.Destroy()
+			clipBuf.Melt()
+			clipBuf.Wipe()
+			
+			myWindow.Clipboard().SetContent("")
+		}
+	}
+
+	updateStatus("Text fields and clipboard securely cleared.\nAll sensitive data wiped from memory.")
 }
 
 func toggleTheme() {
@@ -1039,12 +1138,17 @@ func createGUI() fyne.CanvasObject {
 	chainEntry.Wrapping = fyne.TextTruncate
 	chainContainer := container.NewBorder(nil, nil, chainLabel, nil, chainEntry)
 
+	mimeButton := widget.NewButton("MIME", func() {
+		showSubjectDialog()
+	})
+	
 	randomButton := widget.NewButton("Random", sendRandom)
 	sendButton := widget.NewButton("Send", sendManual)
 	clearButton := widget.NewButton("Clear", secureClear)
 	
 	bottomButtons := container.NewHBox(
 		layout.NewSpacer(),
+		mimeButton,
 		randomButton,
 		sendButton,
 		clearButton,
