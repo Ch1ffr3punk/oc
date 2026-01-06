@@ -3,6 +3,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"encoding/json"
 	"encoding/pem"
@@ -296,42 +297,70 @@ func pingMixnodes() {
 	
 	resultMap := make(map[string]string)
 	resultMutex := &sync.Mutex{}
-	resultReady := make(chan string, len(mixnodes))
+	
+	type nodeResult struct {
+		name   string
+		status string
+	}
+	resultChan := make(chan nodeResult, len(mixnodes))
 	
 	for i := range mixnodes {
 		go func(index int, name string) {
-			status := checkNodeStatus(mixnodes[index].Address)
-			resultMutex.Lock()
-			resultMap[name] = status
-			resultMutex.Unlock()
-			resultReady <- name
+			ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+			defer cancel()
+			
+			status := checkNodeStatusWithContext(ctx, mixnodes[index].Address)
+			resultChan <- nodeResult{name: name, status: status}
 		}(i, mixnodes[i].Name)
 	}
 
 	completed := 0
+	
+	var currentOutput strings.Builder
+	currentOutput.WriteString("Checking mix node status via Tor...\n\n")
+	
+	resultMutex.Lock()
+	for _, node := range mixnodes {
+		currentOutput.WriteString(fmt.Sprintf("%s\t\t\tchecking...\n", node.Name))
+	}
+	resultMutex.Unlock()
+	
+	fyne.Do(func() {
+		statusLabel.SetText(strings.TrimSpace(currentOutput.String()))
+		statusScroll.ScrollToBottom()
+	})
+	
 	for completed < len(mixnodes) {
-		<-resultReady
-		completed++
-		
-		var currentOutput strings.Builder
-		currentOutput.WriteString("Checking mix node status via Tor...\n\n")
-		
-		resultMutex.Lock()
-		for _, node := range mixnodes {
-			if status, exists := resultMap[node.Name]; exists {
-				currentOutput.WriteString(fmt.Sprintf("%s\t\t\t%s\n", node.Name, status))
-			} else {
-				currentOutput.WriteString(fmt.Sprintf("%s\t\t\tchecking...\n", node.Name))
+		select {
+		case result := <-resultChan:
+			completed++
+			
+			resultMutex.Lock()
+			resultMap[result.name] = result.status
+			
+			var updatedOutput strings.Builder
+			updatedOutput.WriteString("Checking mix node status via Tor...\n\n")
+			
+			for _, node := range mixnodes {
+				if status, exists := resultMap[node.Name]; exists {
+					updatedOutput.WriteString(fmt.Sprintf("%s\t\t\t%s\n", node.Name, status))
+				} else {
+					updatedOutput.WriteString(fmt.Sprintf("%s\t\t\tchecking...\n", node.Name))
+				}
 			}
+			
+			progress := float64(completed) / float64(len(mixnodes)) * 100
+			updatedOutput.WriteString(fmt.Sprintf("\nProgress: %d/%d (%.1f%%)", completed, len(mixnodes), progress))
+			
+			resultMutex.Unlock()
+			
+			fyne.Do(func() {
+				statusLabel.SetText(strings.TrimSpace(updatedOutput.String()))
+				statusScroll.ScrollToBottom()
+			})
 		}
-		resultMutex.Unlock()
 		
-		fyne.Do(func() {
-			statusLabel.SetText(strings.TrimSpace(currentOutput.String()))
-			statusScroll.ScrollToBottom()
-		})
-		
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(50 * time.Millisecond)
 	}
 	
 	var finalOutput strings.Builder
@@ -342,9 +371,39 @@ func pingMixnodes() {
 		finalOutput.WriteString(fmt.Sprintf("%s\t\t\t%s\n", node.Name, resultMap[node.Name]))
 	}
 	resultMutex.Unlock()
-	finalOutput.WriteString("\nPing completed!")
+	
+	var timeoutCount, successCount, errorCount int
+	for _, status := range resultMap {
+		if strings.Contains(status, "timeout") || strings.Contains(status, "Timeout") {
+			timeoutCount++
+		} else if strings.Contains(status, "OK") || strings.Contains(status, "success") {
+			successCount++
+		} else {
+			errorCount++
+		}
+	}
+	
+	finalOutput.WriteString(fmt.Sprintf("\nPing completed!\n"))
+	finalOutput.WriteString(fmt.Sprintf("Successful: %d | Timeout: %d | Failed: %d\n", successCount, timeoutCount, errorCount))
 	
 	updateStatus(finalOutput.String())
+}
+
+func checkNodeStatusWithContext(ctx context.Context, address string) string {
+	resultChan := make(chan string, 1)
+	
+	go func() {
+		resultChan <- checkNodeStatus(address)
+	}()
+	
+	select {
+	case result := <-resultChan:
+		return result
+	case <-ctx.Done():
+		return "timeout (60s)"
+	case <-time.After(60 * time.Second):
+		return "timeout (60s)"
+	}
 }
 
 func checkNodeStatus(address string) string {
