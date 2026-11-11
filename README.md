@@ -339,14 +339,6 @@ golang.org/x/crypto/chacha20poly1305: Standardized ChaCha20+Poly1305
 golang.org/x/net/proxy: SOCKS5 proxy support for Tor integration  
 patrickmn/go-cache: In-memory cache for replay protection  
 
-If you like the idea of your own privately run Onion Courier Mixnet,  
-consider a small donation in crypto currencies or buy me a coffee.  
-
-- **Bitcoin:** `bc1qm0e7r94ht60tu7zuewf0ftl3td0xc700rvcagn`
-- **Nym:** `n1f0r6zzu5hgh4rprk2v2gqcyr0f5fr84zv69d3x`  
-
-<a href="https://www.buymeacoffee.com/Ch1ffr3punk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
-
 Onion Courier is dedicated to Alice and Bob.
 
 
